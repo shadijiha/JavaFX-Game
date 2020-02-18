@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>logger.Logger</OriginalElement>
+  <nodes>
+    <node x="346.75" y="0.0">java.lang.Cloneable</node>
+    <node x="233.0" y="869.0">shadoMath.Fraction</node>
+    <node x="356.0" y="544.0">shadoMath.Matrix</node>
+    <node x="0.0" y="763.0">sample.Main</node>
+    <node x="667.0" y="98.0">shapes.Shado.Shape</node>
+    <node x="810.25" y="0.0">shapes.Shado</node>
+    <node x="0.0" y="869.0">shadoMath.Complex</node>
+    <node x="665.5" y="372.0">shapes.Shado.Rectangle</node>
+    <node x="424.0" y="869.0">sample.Controller</node>
+    <node x="627.0" y="869.0">shadoMath.Util</node>
+    <node x="716.0" y="544.0">java.lang.AutoCloseable</node>
+    <node x="153.0" y="763.0">javafx.application.Application.Parameters</node>
+    <node x="47.75" y="544.0">javafx.application.Application</node>
+    <node x="642.5" y="631.0">logger.Logger</node>
+    <node x="430.0" y="87.0">shadoMath.Vector</node>
+    <node x="0.0" y="120.0">shapes.Dimension</node>
+    <node x="194.0" y="98.0">shadoMath.Vertex</node>
+    <node x="911.5" y="372.0">shapes.Shado.Circle</node>
+    <node x="549.0" y="544.0">java.io.Flushable</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="shapes.Shado.Shape" target="java.lang.Cloneable">
+      <point x="-42.5" y="-106.5" />
+      <point x="709.5" y="57.0" />
+      <point x="475.375" y="57.0" />
+      <point x="55.125" y="18.5" />
+    </edge>
+    <edge source="shapes.Dimension" target="java.lang.Cloneable">
+      <point x="0.0" y="-84.5" />
+      <point x="87.0" y="57.0" />
+      <point x="365.125" y="57.0" />
+      <point x="-55.125" y="18.5" />
+    </edge>
+    <edge source="javafx.application.Application.Parameters" target="javafx.application.Application">
+      <point x="0.0" y="-30.5" />
+      <point x="232.0" y="738.0" />
+      <point x="200.0" y="738.0" />
+      <point x="50.75" y="84.5" />
+    </edge>
+    <edge source="shapes.Shado.Circle" target="shapes.Shado.Shape">
+      <point x="-46.5" y="-63.5" />
+      <point x="958.0" y="342.0" />
+      <point x="794.5" y="342.0" />
+      <point x="42.5" y="106.5" />
+    </edge>
+    <edge source="shapes.Shado.Rectangle" target="shapes.Shado">
+      <point x="56.5" y="-63.5" />
+      <point x="835.0" y="352.0" />
+      <point x="847.5" y="352.0" />
+      <point x="847.5" y="67.0" />
+      <point x="861.75" y="67.0" />
+      <point x="0.0" y="18.5" />
+    </edge>
+    <edge source="shapes.Shado.Circle" target="shapes.Shado">
+      <point x="46.5" y="-63.5" />
+      <point x="1051.0" y="67.0" />
+      <point x="896.0833333333333" y="67.0" />
+      <point x="34.333333333333314" y="18.5" />
+    </edge>
+    <edge source="shadoMath.Vertex" target="java.lang.Cloneable">
+      <point x="0.0" y="-106.5" />
+      <point x="302.0" y="67.0" />
+      <point x="401.875" y="67.0" />
+      <point x="-18.375" y="18.5" />
+    </edge>
+    <edge source="logger.Logger" target="java.lang.AutoCloseable">
+      <point x="37.25" y="-73.5" />
+      <point x="754.25" y="606.0" />
+      <point x="811.5" y="606.0" />
+      <point x="0.0" y="18.5" />
+    </edge>
+    <edge source="sample.Main" target="javafx.application.Application">
+      <point x="0.0" y="-30.5" />
+      <point x="66.5" y="738.0" />
+      <point x="98.5" y="738.0" />
+      <point x="-50.75" y="84.5" />
+    </edge>
+    <edge source="logger.Logger" target="java.io.Flushable">
+      <point x="-37.25" y="-73.5" />
+      <point x="679.75" y="606.0" />
+      <point x="622.5" y="606.0" />
+      <point x="0.0" y="18.5" />
+    </edge>
+    <edge source="shadoMath.Vector" target="java.lang.Cloneable">
+      <point x="0.0" y="-117.5" />
+      <point x="538.5" y="67.0" />
+      <point x="438.625" y="67.0" />
+      <point x="18.375" y="18.5" />
+    </edge>
+    <edge source="shapes.Shado.Rectangle" target="shapes.Shado.Shape">
+      <point x="-56.5" y="-63.5" />
+      <point x="722.0" y="352.0" />
+      <point x="709.5" y="352.0" />
+      <point x="-42.5" y="106.5" />
+    </edge>
+    <edge source="shapes.Shado.Shape" target="shapes.Shado">
+      <point x="42.5" y="-106.5" />
+      <point x="794.5" y="67.0" />
+      <point x="827.4166666666666" y="67.0" />
+      <point x="-34.33333333333334" y="18.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="276.5" y="317.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
