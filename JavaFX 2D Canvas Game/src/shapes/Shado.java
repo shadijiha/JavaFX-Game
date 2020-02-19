@@ -18,13 +18,13 @@ public final class Shado {
 		protected Color fill;
 		protected Color stroke;
 		protected int lineWidth;
-		protected Vector velocity;
 
 		protected Shape() {
 			position = new Vertex();
 			dimensions = new Dimension();
-			velocity = new Vector();
 			lineWidth = 1;
+			fill = Color.TRANSPARENT;
+			stroke = Color.BLACK;
 		}
 
 		/**
@@ -39,9 +39,28 @@ public final class Shado {
 		 */
 		public abstract float area();
 
-		public void move() {
+		public void move(Vector velocity) {
 			position.x += velocity.x;
 			position.y += velocity.y;
+		}
+
+		// Collision
+		public boolean collides(Shape other) {
+			if (this instanceof Rectangle && other instanceof Rectangle) {
+				return other.position.x + other.dimensions.width >= position.x
+						&& other.position.x <= position.x + dimensions.width
+						&& other.position.y + other.dimensions.height >= position.y
+						&& other.position.y <= position.y + dimensions.height;
+			} else if (this instanceof Circle && other instanceof Circle) {
+				var centerO = other.getCenter();
+				var centerT = this.getCenter();
+				return centerO.getDistance(centerT) <= ((Circle) other).getRadius() + ((Circle) this).getRadius();
+			} else if (this instanceof Rectangle && other instanceof Circle) {
+				var hitBox = new Shado.Rectangle(other.position, other.dimensions);
+				return this.collides(hitBox);
+			} else {
+				return false;
+			}
 		}
 
 		// Setters
@@ -111,13 +130,6 @@ public final class Shado {
 			return this;
 		}
 
-		public Shape setVelocity(Vector vel) {
-			this.velocity.x = vel.x;
-			this.velocity.y = vel.y;
-			this.velocity.z = vel.z;
-			return this;
-		}
-
 		// Overridden java.lang.Object functions
 		public boolean equals(Object o) {
 			if (o == null || o.getClass() != getClass()) {
@@ -140,9 +152,8 @@ public final class Shado {
 				clone.fill = new Color(fill.getRed(), fill.getGreen(), fill.getBlue(), fill.getOpacity());
 				clone.stroke = new Color(stroke.getRed(), stroke.getGreen(), stroke.getBlue(), stroke.getOpacity());
 				clone.lineWidth = lineWidth;
-				clone.velocity = velocity.clone();
 				return clone;
-			} catch (Exception e) {
+			} catch (CloneNotSupportedException e) {
 				return null;
 			}
 		}
@@ -154,6 +165,10 @@ public final class Shado {
 		 */
 		public Vertex getPosition() {
 			return new Vertex(position);
+		}
+
+		public Vertex getCenter() {
+			return new Vertex(position.x + dimensions.width / 2, position.y + dimensions.height / 2);
 		}
 
 		/**
@@ -213,11 +228,6 @@ public final class Shado {
 			g.strokeRect(position.x, position.y, dimensions.width, dimensions.height);
 		}
 
-		// Collisions
-		public boolean Collides(Shado.Rectangle other) {
-			return false;
-		}
-
 		/**
 		 * @return Returns the area of the rectangle
 		 */
@@ -232,12 +242,12 @@ public final class Shado {
 		public Circle(float x, float y, float r) {
 			position.x = x;
 			position.y = y;
-			dimensions.width = r;
-			dimensions.height = r;
+			dimensions.width = r * 2;
+			dimensions.height = r * 2;
 		}
 
 		public Circle(Vertex pos, Dimension d) {
-			this((float) pos.x, (float) pos.y, d.width);
+			this((float) pos.x, (float) pos.y, d.width / 2);
 		}
 
 		public Circle() {
@@ -253,22 +263,22 @@ public final class Shado {
 			g.setFill(fill);
 			g.setStroke(stroke);
 			g.setLineWidth(lineWidth);
-			g.fillOval(position.x, position.y, dimensions.width, dimensions.width);
-			g.strokeOval(position.x, position.y, dimensions.width, dimensions.width);
+			g.fillOval(position.x, position.y, dimensions.width, dimensions.height);
+			g.strokeOval(position.x, position.y, dimensions.width, dimensions.height);
 		}
 
 		@Override
 		public float area() {
-			return (float) (Math.PI * dimensions.width * dimensions.width);
+			return (float) (Math.PI * getRadius() * getRadius());
 		}
 
 		public float getRadius() {
-			return dimensions.width;
+			return dimensions.width / 2;
 		}
 
 		public Circle setRadius(float radius) {
-			dimensions.width = radius;
-			dimensions.height = radius;
+			dimensions.width = radius * 2;
+			dimensions.height = radius * 2;
 			return this;
 		}
 	}
