@@ -105,7 +105,7 @@ public final class Shado {
 		 * @return Returns the calling object
 		 */
 		public Shape setStroke(final Color c) {
-			fill = new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getOpacity());
+			stroke = new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getOpacity());
 			return this;
 		}
 

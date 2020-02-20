@@ -1,5 +1,6 @@
 package sample;
 
+import game.Time;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -9,10 +10,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
 import logger.Logger;
 import shapes.Game;
+import shapes.Shado;
 
 public class Main extends Application {
 
 	public static final Logger LOGGER = new Logger(false);
+	private final long[] frameTimes = new long[100];
+	private int frameTimeIndex = 0;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -34,21 +38,40 @@ public class Main extends Application {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
 		// Initialize shapes to draw
-		Game.initialize();
+		Game.initialize(canvas);
+
+		Shado.Text FPS_TEXT = new Shado.Text("Loading...", 10, 30);
 
 		// clear the canvas and Draw shapes
 		new AnimationTimer() {
-			public void handle(long currentNanoTime) {
+			public void handle(long now) {
 				gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
 				// background image clears canvas
 				Game.render(gc);
+
+				// Calculate and display FPS
+				long oldFrameTime = frameTimes[frameTimeIndex];
+				frameTimes[frameTimeIndex] = now;
+				frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
+
+				long elapsedNanos = now - oldFrameTime;
+				long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
+				double frameRate = 1_000_000_000.0 / elapsedNanosPerFrame;
+
+				if (frameRate >= 1) {
+					Time.deltaTime = elapsedNanos / 100000000D;
+					FPS_TEXT.setText(String.format("%.3f FPS", frameRate));
+				}
+				FPS_TEXT.draw(gc);
 			}
 		}.start();
 
 
 		root.getChildren().add(canvas);
-		primaryStage.setScene(new Scene(root));
+		Scene scene = new Scene(root);
+		Game.handleEvents(scene);
+		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
 }

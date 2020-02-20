@@ -33,7 +33,7 @@ public class Dimension implements Cloneable {
 	}
 
 	public String toString() {
-		return String.format("(w: %f, w: %f)", width, height);
+		return String.format("(w: %f, h: %f)", width, height);
 	}
 
 	public Dimension clone() {

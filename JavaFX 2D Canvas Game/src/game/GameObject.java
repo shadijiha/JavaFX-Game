@@ -30,6 +30,7 @@ public abstract class GameObject {
 		this.hidden = false;
 		this.position = new Vertex(0, 0);
 		this.velocity = new Vector(0, 0);
+		this.dimensions = new Dimension(0, 0);
 		this.shape = new Shado.Rectangle(position, dimensions);
 
 		allGameObject.add(this);
@@ -42,6 +43,12 @@ public abstract class GameObject {
 		position.x += velocity.x;
 		position.y += velocity.y;
 		shape.move(velocity);
+	}
+
+	public void move(double x, double y) {
+		position.x += x;
+		position.y += y;
+		shape.move(new Vector(x, y));
 	}
 
 	// Setters
@@ -62,6 +69,11 @@ public abstract class GameObject {
 		position.y = v.y;
 	}
 
+	public void setDimensions(Dimension d) {
+		dimensions.width = d.width;
+		dimensions.height = d.height;
+	}
+
 	// Getters
 	public int getId() {
 		return this.id;
@@ -76,11 +88,19 @@ public abstract class GameObject {
 	}
 
 	public Vertex getPosition() {
-		return new Vertex(position);
+		return position;
 	}
 
 	public Vector getVelocity() {
-		return new Vector(velocity);
+		return velocity;
+	}
+
+	public Dimension getDimensions() {
+		return dimensions;
+	}
+
+	public Shado.Shape getShape() {
+		return this.shape;
 	}
 
 }
