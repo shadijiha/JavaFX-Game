@@ -14,6 +14,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import shadoMath.Vertex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public abstract class Game {
 	public static void initialize(Canvas c) {
 
 		GROUND_LEVEL = (int) (c.getHeight() * 0.70);
+		player.setPosition(new Vertex(c.getWidth() * 0.20, 0));
 
 		// Draw ground
 		var ground = new Platform(-10000, GROUND_LEVEL, (float) c.getWidth() + 20000, (float) c.getHeight() - GROUND_LEVEL);
@@ -52,20 +54,20 @@ public abstract class Game {
 		environment.add(sun);
 
 		// Add monsters
-		for (int i = 0; i < 1; i++) {
-			var monster = new Player(100 * i + 400, 1);
+		for (int i = 0; i < 2; i++) {
+			var monster = new Player(200 * i + 500, 1);
 			monster.getShape().setFill(Color.PURPLE);
 			allMonsters.add(monster);
 		}
 
 		// Add platforms
 		for (int i = 0; i < 1; i++) {
-			var platform = new Platform(150 * i + 200, 50 * i + 300, 100, 25);
+			var platform = new Platform(150 * i + 400, 50 * i + 300, 100, 25);
 			platform.setFill(Color.LIGHTGRAY);
 		}
 	}
 
-	public static void render(GraphicsContext g) {
+	public static void render(GraphicsContext g, Canvas c) {
 		// Render sky
 		Game.environment.parallelStream()
 				.forEachOrdered(e -> e.draw(g));
@@ -146,35 +148,39 @@ public abstract class Game {
 					}
 				});
 
+		// Draw Player HUD
+		player.drawHUD(g, c);
+
 	}
 
 	public static void moveWorld(double amount) {
+		final double final_amount = amount * Time.deltaTime / 10;
 		// Move environment
 		environment.parallelStream()
 				.forEachOrdered(e -> {
-					e.getPosition().x = e.getPosition().x + amount;
+					e.getPosition().x += final_amount * 0.15;
 				});
 
 		// Move monsters and their bullets
 		allMonsters.parallelStream()
 				.forEachOrdered(e -> {
-					e.move(amount * Time.deltaTime / 20, 0);
+					e.move(final_amount, 0);
 
 					e.getAllBullets().parallelStream()
-							.forEachOrdered(bullet -> bullet.move(amount * Time.deltaTime / 20, 0));
+							.forEachOrdered(bullet -> bullet.move(final_amount, 0));
 				});
 
 		// Move all platforms
 		Platform.allPlatforms.parallelStream()
 				.forEachOrdered(e -> {
 					if (!e.isImmobile()) {
-						e.move(amount * Time.deltaTime / 20, 0);
+						e.move(final_amount, 0);
 					}
 				});
 
 		// Move all bullets of player
 		player.getAllBullets().parallelStream()
-				.forEachOrdered(e -> e.move(amount * Time.deltaTime / 20, 0));
+				.forEachOrdered(e -> e.move(final_amount, 0));
 	}
 
 	public static void handleEvents(Scene scene) {

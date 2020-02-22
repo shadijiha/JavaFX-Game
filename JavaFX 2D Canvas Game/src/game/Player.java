@@ -4,8 +4,11 @@
 
 package game;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import shadoMath.Vertex;
+import shapes.Dimension;
 import shapes.Shado;
 
 import java.util.ArrayList;
@@ -18,13 +21,18 @@ public class Player extends GameObject {
 	private List<Bullet> bullets = new ArrayList<>();
 
 	private float maxHp = 1000.0f;
-	private float hp = 1000.0f;
+	private float hp = 500.0f;
+	private float hpRegen = 0.001f;
+	private float maxEnergy = 200.0f;
+	private float energy = 200.0f;
+	private float energyRegen = 0.05f;
 	private float ad = 60.0f;
 	private float armor = 23.0f;
 	private int range = 500;
 
 	private double gravity = 0.1;
 	private double lift = -5.0;
+	private float jumpCost = 20.0f;
 	private int ms = 10;
 
 
@@ -67,6 +75,14 @@ public class Player extends GameObject {
 						this.velocity.y = 0;
 					}
 				});
+
+		// Regen energy
+		energy += energyRegen * Time.deltaTime;
+		hp += hpRegen * Time.deltaTime;
+
+		// Keep every stat normal
+		energy = energy > maxEnergy ? maxEnergy : energy;
+		hp = hp > maxHp ? maxHp : hp;
 	}
 
 	/**
@@ -87,15 +103,15 @@ public class Player extends GameObject {
 	 * Adds velocity the player for it to jump
 	 */
 	public void jump() {
-//		if (
-//				this.energy > this.jumpCost &&
-//						this.hp > 0 &&
-//						!this.stunned &&
-//						!this.rooted
-//		) {
-		this.velocity.y += this.lift;
-		//this.energy -= this.jumpCost;
-		//}
+		if (
+				this.energy > this.jumpCost &&
+						this.hp > 0 //&&
+			//!this.stunned &&
+			//!this.rooted
+		) {
+			this.velocity.y += this.lift * Time.deltaTime / 10;
+			this.energy -= this.jumpCost;
+		}
 	}
 
 	/**
@@ -120,15 +136,77 @@ public class Player extends GameObject {
 	/**
 	 * Draw the health bar of the calling object
 	 * @param g The GraphicsContext
+	 * @param p Position of the health bar
+	 * @param d dimension of the health bar
 	 */
-	public void drawHealthBar(GraphicsContext g) {
+	private void drawHealthBar(GraphicsContext g, Vertex p, Dimension d) {
 		double percentage = hp / maxHp;
 
-		var main_bar = new Shado.Rectangle((float) position.x, (float) position.y - 30, dimensions.width, 10);
+		var main_bar = new Shado.Rectangle((float) p.x, (float) p.y, d.width, d.height);
 		var sec_bar = new Shado.Rectangle((float) main_bar.getPosition().x, (float) main_bar.getPosition().y, (float) (main_bar.getDimensions().width * percentage), (float) main_bar.getDimensions().height);
 
 		main_bar.setFill(Color.WHITE).draw(g);
 		sec_bar.setFill(Color.GREEN).draw(g);
+	}
+
+	/**
+	 * Draw the health bar of the calling object
+	 * @param g The GraphicsContext
+	 */
+	public void drawHealthBar(GraphicsContext g) {
+		drawHealthBar(g, new Vertex((float) position.x, (float) position.y - 30), new Dimension(dimensions.width, 15));
+	}
+
+	/**
+	 * Draw the health bar of the calling object
+	 * @param g The GraphicsContext
+	 * @param p Position of the health bar
+	 * @param d dimension of the health bar
+	 */
+	private void drawEnergyBar(GraphicsContext g, Vertex p, Dimension d) {
+		double percentage = energy / maxEnergy;
+
+		var main_bar = new Shado.Rectangle((float) p.x, (float) p.y, d.width, d.height);
+		var sec_bar = new Shado.Rectangle(
+				(float) main_bar.getPosition().x,
+				(float) main_bar.getPosition().y,
+				(float) (main_bar.getDimensions().width * percentage),
+				(float) main_bar.getDimensions().height);
+
+		main_bar.setFill(Color.WHITE).draw(g);
+		sec_bar.setFill(Color.BLUE).draw(g);
+	}
+
+	/**
+	 * Draw all the infomation of the current object to the screen
+	 * @param g The Graphic context
+	 * @param c The canvas on the graphic context
+	 */
+	public void drawHUD(GraphicsContext g, Canvas c) {
+
+		Dimension HUD_dimensions = new Dimension((float) (c.getWidth() * 0.45), (float) (c.getHeight() * 0.25));
+		Vertex center = new Vertex(c.getWidth() / 2 - HUD_dimensions.width / 2, c.getHeight() - HUD_dimensions.height);
+
+		final var main_HUD = new Shado.Rectangle((float) center.x, (float) center.y, HUD_dimensions.width, HUD_dimensions.height);
+		main_HUD.setFill(Color.rgb(150, 150, 150, 0.8));
+		main_HUD.draw(g);
+
+		// Draw big health bar and text
+		float bar_height = (float) (main_HUD.getDimensions().height * 0.10);
+		drawHealthBar(g,
+				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height),
+				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
+
+		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.0f", hp, maxHp, hpRegen),
+				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2),
+				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height));
+		hp_bar_text.draw(g);
+
+		// Draw big energy bar
+		drawEnergyBar(g,
+				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80),
+				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
+
 	}
 
 	// Getters

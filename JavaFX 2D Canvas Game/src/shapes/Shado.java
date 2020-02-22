@@ -164,7 +164,7 @@ public final class Shado {
 		 * @return Returns the position
 		 */
 		public Vertex getPosition() {
-			return new Vertex(position);
+			return position;
 		}
 
 		public Vertex getCenter() {
@@ -175,7 +175,7 @@ public final class Shado {
 		 * @return Returns the dimension of the shape
 		 */
 		public Dimension getDimensions() {
-			return new Dimension(dimensions);
+			return dimensions;
 		}
 	}
 
