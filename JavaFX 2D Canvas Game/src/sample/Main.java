@@ -34,7 +34,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Drawing Operations Test");
 		Group root = new Group();
-		Canvas canvas = new Canvas(1000, 562.5);
+		Canvas canvas = new Canvas(1400, 700);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
 		// Initialize shapes to draw
@@ -62,6 +62,7 @@ public class Main extends Application {
 				if (frameRate >= 1) {
 					Time.deltaTime = elapsedNanos / 100000000D;
 					FPS_TEXT.setText(String.format("%.3f FPS", frameRate));
+					Time.addTime(Time.deltaTime);
 				}
 				FPS_TEXT.draw(gc);
 			}

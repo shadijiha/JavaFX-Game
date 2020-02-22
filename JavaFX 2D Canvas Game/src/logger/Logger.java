@@ -10,10 +10,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Logger implements AutoCloseable, Flushable {
 	private PrintWriter writer;
 	private boolean overwrite;
+	private List<String> buffer = new ArrayList<>();
+
+	private final String YELLOW = "\\u001b[33m";
+	private final String RED = "\\u001b[31m";
+	private final String GREEN = "\\u001b[32m";
+	private final String RESET = "\\u001b[0m";
 
 	public Logger(boolean overwrite) {
 		this.overwrite = overwrite;
@@ -25,16 +33,56 @@ public class Logger implements AutoCloseable, Flushable {
 		}
 	}
 
-	public void error(Exception e) {
-		write("error", e);
+	public void error(String e) {
+		logToConsole("ERROR: " + e, RED);
 	}
 
-	public void info(Exception e) {
-		write("info", e);
+	public void warn(String e) {
+		logToConsole("WARNING: " + e, YELLOW);
 	}
 
-	public void log(Exception e) {
-		this.info(e);
+	public void info(String e) {
+		logToConsole("INFO: " + e, GREEN);
+	}
+
+	public void info(String[] e) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{ ");
+		for (var s : e) {
+			sb.append(s);
+			sb.append(", ");
+		}
+		sb.append(" }");
+
+		this.info(sb.toString());
+	}
+
+	public void logToFile(Exception e) {
+		for (String s : buffer) {
+			writetoFile(s);
+		}
+	}
+
+	public void writetoFile(String s) {
+		try {
+			writer.write(s);
+			writer.flush();
+		} catch (Exception e) {
+			error("Cannot export Logger buffer to file");
+			e.printStackTrace();
+		}
+	}
+
+	private void logToConsole(String msg, String color) {
+		// Get Date and format it
+		DateTimeFormatter date = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		String d = date.format(now);
+		String final_msg = String.format("%s[%s] : %s%s\n", color, d, msg, RESET);
+
+		System.out.printf(final_msg);
+		buffer.add(final_msg);
 	}
 
 	// Private stuff

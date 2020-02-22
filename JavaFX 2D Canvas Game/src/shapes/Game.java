@@ -4,6 +4,7 @@
 
 package shapes;
 
+import game.Bullet;
 import game.Platform;
 import game.Player;
 import game.Time;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public abstract class Game {
 
-	private static final int GROUND_LEVEL = 400;
+	private static int GROUND_LEVEL = 400;
 	public static Player player = new Player(50, 0);
 
 	// This list holds environment stuff (sun, sky, etc)
@@ -29,6 +30,8 @@ public abstract class Game {
 	private static List<Player> allMonsters = new ArrayList<>();
 
 	public static void initialize(Canvas c) {
+
+		GROUND_LEVEL = (int) (c.getHeight() * 0.70);
 
 		// Draw ground
 		var ground = new Platform(-10000, GROUND_LEVEL, (float) c.getWidth() + 20000, (float) c.getHeight() - GROUND_LEVEL);
@@ -74,13 +77,74 @@ public abstract class Game {
 		// Draw all monsters
 		Game.allMonsters.parallelStream()
 				.forEachOrdered(e -> {
-					e.draw(g);
-					e.update();
+
+					// Update monster and draw it if they are not hidden
+					if (!e.isHidden()) {
+						e.draw(g);
+						e.update();
+						e.drawHealthBar(g);    // Draw all Health bars of monsters
+					}
+
+					// If monster has less or equal to 0 Hp, Hide it
+					if (e.isDead())
+						e.hide();
+
+					// Draw all bullets of monsters
+					e.getAllBullets().parallelStream()
+							.forEachOrdered(b -> {
+								b.update();
+								b.draw(g);
+							});
 				});
 
 		// Draw and update player
 		player.draw(g);
 		player.update();
+
+		// Draw all player's bullets and detect collision with Monsters
+		player.getAllBullets().parallelStream()
+				.forEachOrdered(b -> {
+					// Update and draw each bullet
+					b.update();
+					b.draw(g);
+
+					// Detect if bullet has exceeded range of player
+					if (b.getPosition().getDistance(player.getPosition()) > player.getRange())
+						b.setActivityTo(false);
+
+					// Detect collision with monsters
+					allMonsters.parallelStream()
+							.forEachOrdered(monster -> {
+
+								// If a bullet shot by player collides a monster:
+								// Applies only if bullet is active and monster is not hidden
+								// Damage the monster and set the bullet to be inactive (to delete it later)
+								if (b.isActive() && !monster.isHidden() && monster.getShape().collides(b.getShape())) {
+									monster.damage(player);
+									b.setActivityTo(false);
+								}
+							});
+
+				});
+
+		// Go over all the bullets of the player and delete all inactive once
+		List<Bullet> player_bullets = player.getAllBullets();
+		for (int i = player_bullets.size() - 1; i >= 0; i--) {
+			if (!player_bullets.get(i).isActive()) {
+				player_bullets.remove(i);
+			}
+		}
+
+		// Go over all the bullets of all Monsters and delete all inactive once
+		allMonsters.parallelStream()
+				.forEachOrdered(monster -> {
+					List<Bullet> monster_bullets = monster.getAllBullets();
+					for (int i = monster_bullets.size() - 1; i >= 0; i--) {
+						if (!monster_bullets.get(i).isActive()) {
+							monster_bullets.remove(i);
+						}
+					}
+				});
 
 	}
 
@@ -91,17 +155,26 @@ public abstract class Game {
 					e.getPosition().x = e.getPosition().x + amount;
 				});
 
+		// Move monsters and their bullets
 		allMonsters.parallelStream()
 				.forEachOrdered(e -> {
 					e.move(amount * Time.deltaTime / 20, 0);
+
+					e.getAllBullets().parallelStream()
+							.forEachOrdered(bullet -> bullet.move(amount * Time.deltaTime / 20, 0));
 				});
 
+		// Move all platforms
 		Platform.allPlatforms.parallelStream()
 				.forEachOrdered(e -> {
 					if (!e.isImmobile()) {
 						e.move(amount * Time.deltaTime / 20, 0);
 					}
 				});
+
+		// Move all bullets of player
+		player.getAllBullets().parallelStream()
+				.forEachOrdered(e -> e.move(amount * Time.deltaTime / 20, 0));
 	}
 
 	public static void handleEvents(Scene scene) {
@@ -109,16 +182,19 @@ public abstract class Game {
 			@Override
 			public void handle(KeyEvent event) {
 				switch (event.getCode()) {
-					case UP:
+					case W:
 						player.jump();
 						break;
-					case DOWN:
+					case S:
 						break;
-					case LEFT:
+					case A:
 						moveWorld(player.getMS());
 						break;
-					case RIGHT:
+					case D:
 						moveWorld(-1 * player.getMS());
+						break;
+					case SPACE:
+						player.shoot();
 						break;
 				}
 			}
