@@ -20,14 +20,16 @@ public class Player extends GameObject {
 
 	private List<Bullet> bullets = new ArrayList<>();
 
-	private float maxHp = 1000.0f;
-	private float hp = 500.0f;
-	private float hpRegen = 0.001f;
-	private float maxEnergy = 200.0f;
-	private float energy = 200.0f;
-	private float energyRegen = 0.05f;
-	private float ad = 60.0f;
-	private float armor = 23.0f;
+	private double maxHp = 1000.0f;
+	private double hp = 500.0f;
+	private double hpRegen = 0.001f;
+
+	private double maxEnergy = 200.0f;
+	private double energy = 200.0f;
+	private double energyRegen = 0.01f;
+
+	private double ad = 60.0f;
+	private double armor = 23.0f;
 	private int range = 500;
 
 	private double gravity = 0.1;
@@ -126,9 +128,9 @@ public class Player extends GameObject {
 	 * @param source The damage source
 	 * @return Returns the amount substracted from the calling object health
 	 */
-	public float damage(Player source) {
-		float reduction = armor / (100 + armor);
-		float temp = source.ad * (1 - reduction);
+	public double damage(Player source) {
+		double reduction = armor / (100 + armor);
+		double temp = source.ad * (1 - reduction);
 		hp -= temp;
 		return temp;
 	}
@@ -197,15 +199,20 @@ public class Player extends GameObject {
 				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height),
 				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
 
-		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.0f", hp, maxHp, hpRegen),
-				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2),
-				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height));
+		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", hp, maxHp, hpRegen * Time.deltaTime * Time.framerate()),
+				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2 - 20),
+				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80 - bar_height + main_HUD.getDimensions().height * 0.10 / 4));
 		hp_bar_text.draw(g);
 
 		// Draw big energy bar
 		drawEnergyBar(g,
 				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80),
 				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
+		var energy_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", energy, maxEnergy, energyRegen * Time.deltaTime * Time.framerate()),
+				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2 - 20),
+				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80 + main_HUD.getDimensions().height * 0.15 / 2));
+		energy_bar_text.draw(g);
+
 
 	}
 

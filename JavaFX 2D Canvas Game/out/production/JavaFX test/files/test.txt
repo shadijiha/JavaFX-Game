@@ -1,0 +1,3 @@
+health: 50
+energy: 13
+ad: "This is a test"

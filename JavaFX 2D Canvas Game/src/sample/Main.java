@@ -57,11 +57,11 @@ public class Main extends Application {
 
 				long elapsedNanos = now - oldFrameTime;
 				long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
-				double frameRate = 1_000_000_000.0 / elapsedNanosPerFrame;
+				Time.setFramerate(1_000_000_000.0 / elapsedNanosPerFrame);
 
-				if (frameRate >= 1) {
+				if (Time.framerate() >= 1) {
 					Time.deltaTime = elapsedNanos / 100000000D;
-					FPS_TEXT.setText(String.format("%.3f FPS", frameRate));
+					FPS_TEXT.setText(String.format("%.3f FPS", Time.framerate()));
 
 					// Increment the time elapsed since program start
 					Time.addTime(Time.deltaTime);
