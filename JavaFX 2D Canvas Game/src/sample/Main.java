@@ -29,7 +29,6 @@ public class Main extends Application {
 		}
 	}
 
-
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Drawing Operations Test");
