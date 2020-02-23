@@ -11,8 +11,20 @@ public final class Time {
 
 	// Time since the start of the program
 	private static double start = 0.0;
+	private static double fps = 60.0;
 
 	private Time() {
+	}
+
+	/**
+	 * @return Returns the framerate of the application
+	 */
+	public static double framerate() {
+		return fps;
+	}
+
+	public static void setFramerate(double num) {
+		fps = num;
 	}
 
 	/**

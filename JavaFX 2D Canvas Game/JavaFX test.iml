@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="javafx-11.0.2" level="application" />
     <orderEntry type="library" name="javafx-Laptop" level="project" />
+    <orderEntry type="library" name="json-simple-1.1.11" level="project" />
   </component>
 </module>
