@@ -9,3 +9,7 @@ armor: 12			// player's armor
 range: 500			// player's attack range
 ms: 10				// player mouvemenet speed
 jumpCost: 20.0		// player's energy cost per jump
+ap: 0				// Player's ability power
+magicResist: 12		// Player's magic resist
+attackSpeed: 0.69	// Player's attacks per second
+critChance: 0		// player's critical strike chance

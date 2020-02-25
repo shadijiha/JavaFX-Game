@@ -102,7 +102,7 @@ public final class Shado {
 		/**
 		 * @return Returns the area of the calling Shape
 		 */
-		public abstract float area();
+		public abstract double area();
 
 		public void move(Vector velocity) {
 			position.x += velocity.x;
@@ -267,7 +267,7 @@ public final class Shado {
 		 * @param w The width of the rectangle
 		 * @param h The height of the rectangle
 		 */
-		public Rectangle(float x, float y, float w, float h) {
+		public Rectangle(double x, double y, double w, double h) {
 			super();
 			position.x = x;
 			position.y = y;
@@ -278,7 +278,7 @@ public final class Shado {
 		}
 
 		public Rectangle(Vertex pos, Dimension d) {
-			this((float) pos.x, (float) pos.y, d.width, d.height);
+			this(pos.x, pos.y, d.width, d.height);
 		}
 
 		/**
@@ -314,14 +314,14 @@ public final class Shado {
 		 * @return Returns the area of the rectangle
 		 */
 		@Override
-		public float area() {
+		public double area() {
 			return dimensions.width * dimensions.height;
 		}
 	}
 
 	public static class Circle extends Shape {
 
-		public Circle(float x, float y, float r) {
+		public Circle(double x, double y, double r) {
 			position.x = x;
 			position.y = y;
 			dimensions.width = r * 2;
@@ -329,7 +329,7 @@ public final class Shado {
 		}
 
 		public Circle(Vertex pos, Dimension d) {
-			this((float) pos.x, (float) pos.y, d.width / 2);
+			this(pos.x, pos.y, d.width / 2);
 		}
 
 		public Circle() {
@@ -353,11 +353,11 @@ public final class Shado {
 		}
 
 		@Override
-		public float area() {
+		public double area() {
 			return (float) (Math.PI * getRadius() * getRadius());
 		}
 
-		public float getRadius() {
+		public double getRadius() {
 			return dimensions.width / 2;
 		}
 
@@ -378,7 +378,7 @@ public final class Shado {
 		 * @param toX   The width of the rectangle
 		 * @param toY   The height of the rectangle
 		 */
-		public Line(float fromX, float fromY, float toX, float toY) {
+		public Line(double fromX, double fromY, double toX, double toY) {
 			super();
 			position.x = fromX;
 			position.y = fromY;
@@ -388,7 +388,7 @@ public final class Shado {
 		}
 
 		public Line(Vertex pos, Dimension d) {
-			this((float) pos.x, (float) pos.y, d.width, d.height);
+			this(pos.x, pos.y, d.width, d.height);
 		}
 
 		/**
@@ -422,7 +422,7 @@ public final class Shado {
 		 * @return Returns the area of the rectangle
 		 */
 		@Override
-		public float area() {
+		public double area() {
 			return 0.0f;
 		}
 	}
@@ -432,7 +432,7 @@ public final class Shado {
 		private Font font;
 		private String text;
 
-		public Text(String content, float x, float y, Font font, Color fillColor, Color strokeColor) {
+		public Text(String content, double x, double y, Font font, Color fillColor, Color strokeColor) {
 			super();
 			this.text = content;
 			position.x = x;
@@ -442,7 +442,7 @@ public final class Shado {
 			stroke = strokeColor;
 		}
 
-		public Text(String content, float x, float y) {
+		public Text(String content, double x, double y) {
 			this(content, x, y, new Font("Arial", 16), Color.rgb(0, 0, 0), Color.rgb(0, 0, 0, 0));
 		}
 
@@ -452,6 +452,25 @@ public final class Shado {
 
 		public Text(final Text other) {
 			this(other.text, (float) other.position.x, (float) other.position.y, other.font, other.fill, other.stroke);
+		}
+
+		// Getters
+		public double getWidth() {
+			int lineLength = getBiggestLineLength();
+
+			return lineLength * font.getSize();
+		}
+
+		private int getBiggestLineLength() {
+			String[] temp = text.split("\n");
+
+			int biggest = 0;
+			for (String s : temp) {
+				if (s.length() >= biggest) {
+					biggest = s.length();
+				}
+			}
+			return biggest;
 		}
 
 		// Setters
@@ -513,7 +532,7 @@ public final class Shado {
 		}
 
 		@Override
-		public float area() {
+		public double area() {
 			return 0.0f;
 		}
 	}
@@ -525,7 +544,7 @@ public final class Shado {
 		private String source;
 		private File file;
 
-		public Image(String src, float x, float y, float w, float h) {
+		public Image(String src, double x, double y, double w, double h) {
 			position.x = x;
 			position.y = y;
 			dimensions.width = w;
@@ -543,6 +562,13 @@ public final class Shado {
 			String[] absolute_path = file.getAbsolutePath().split("");
 			absolute_path[0] = "file";
 			return String.join("", absolute_path);
+		}
+
+		/**
+		 * @return Returns the absolute path of the Shado.Image with disk name replaced with "file:/"
+		 */
+		public String getImageAbsolutePath() {
+			return toFileProtocole(file.getAbsolutePath());
 		}
 
 		@Override
@@ -593,7 +619,7 @@ public final class Shado {
 		}
 
 		@Override
-		public float area() {
+		public double area() {
 			return dimensions.width * dimensions.width;
 		}
 	}

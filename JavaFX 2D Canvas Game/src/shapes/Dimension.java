@@ -5,10 +5,10 @@
 package shapes;
 
 public class Dimension implements Cloneable {
-	public float width;
-	public float height;
+	public double width;
+	public double height;
 
-	public Dimension(float w, float h) {
+	public Dimension(double w, double h) {
 		width = w;
 		height = h;
 	}

@@ -4,7 +4,7 @@
 
 package game;
 
-import dataGetters.ReadShadoFile;
+import dataGetters.ReadShadoObjectNotationFile;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -30,8 +30,15 @@ public class Player extends GameObject {
 	private double energy;
 	private double energyRegen;
 
+	private double ap;
+	private double mr;
+
+	private double attackSpeed;
+	private double critChance;
+
 	private double ad;
 	private double armor;
+
 	private int range;
 	private double jumpCost;
 	private int ms;
@@ -40,7 +47,7 @@ public class Player extends GameObject {
 	private double lift = -5.0;
 
 	// Read properties from a file
-	private ReadShadoFile props;
+	private ReadShadoObjectNotationFile props;
 
 	public Player(int x, int y, String propsFileName) {
 		super("player");
@@ -52,7 +59,7 @@ public class Player extends GameObject {
 		shape.setDimensions(dimensions);
 		shape.setFill(Color.PINK);
 
-		props = new ReadShadoFile(propsFileName, Main.LOGGER);
+		props = new ReadShadoObjectNotationFile(propsFileName, Main.LOGGER);
 		initializeProps();
 
 		allPlayers.add(this);
@@ -71,8 +78,15 @@ public class Player extends GameObject {
 		energy = Double.parseDouble(props.get("energy", true));
 		energyRegen = Double.parseDouble(props.get("energyRegen", true));
 
+		ap = Double.parseDouble(props.get("ap", true));
+		mr = Double.parseDouble(props.get("magicResist", true));
+
+		attackSpeed = Double.parseDouble(props.get("attackSpeed", true));
+		critChance = Double.parseDouble(props.get("critChance", true));
+
 		ad = Double.parseDouble(props.get("ad", true));
 		armor = Double.parseDouble(props.get("armor", true));
+
 		range = Integer.parseInt(props.get("range", true));
 		ms = Integer.parseInt(props.get("ms", true));
 
@@ -207,7 +221,7 @@ public class Player extends GameObject {
 				(float) main_bar.getDimensions().height);
 
 		main_bar.setFill(Color.WHITE).draw(g);
-		sec_bar.setFill(Color.BLUE).draw(g);
+		sec_bar.setFill(Color.rgb(0, 128, 255)).draw(g);
 	}
 
 	/**
@@ -226,25 +240,52 @@ public class Player extends GameObject {
 
 		// Draw big health bar and text
 		float bar_height = (float) (main_HUD.getDimensions().height * 0.10);
+		Vertex health_bar_pos = new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10,
+				main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height);
+
+		Dimension health_bar_dim = new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height);
+
 		drawHealthBar(g,
-				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height),
-				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
+				health_bar_pos,
+				health_bar_dim);
 
 		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", hp, maxHp, hpRegen * Timer.deltaTime * Timer.framerate()),
-				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2 - 20),
-				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80 - bar_height + main_HUD.getDimensions().height * 0.10 / 4));
+				(health_bar_pos.x + (health_bar_dim.width) / 2 - 20),
+				(health_bar_pos.y + 2 * bar_height / 3));
 		hp_bar_text.draw(g);
 
 		// Draw big energy bar
 		drawEnergyBar(g,
-				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80),
-				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
+				new Vertex(health_bar_pos.x, health_bar_pos.y + bar_height * 1.25),
+				health_bar_dim);
 		var energy_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", energy, maxEnergy, energyRegen * Timer.deltaTime * Timer.framerate()),
-				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2 - 20),
-				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80 + main_HUD.getDimensions().height * 0.15 / 2));
+				(health_bar_pos.x + health_bar_dim.width / 2 - 20),
+				(health_bar_pos.y + bar_height * 2));
 		energy_bar_text.draw(g);
 
+		//========= Draw stats and portrait ==================
+		Dimension stat_box_dim = new Dimension(250, HUD_dimensions.height);
+		var stats_box = new Shado.Rectangle(center.x - stat_box_dim.width, center.y, stat_box_dim.width, stat_box_dim.height);
+		stats_box.setFill(Color.rgb(100, 100, 100, 0.5));
+		stats_box.draw(g);
 
+		// Display portrait
+		Shado.Image portait = new Shado.Image(texture_path, stats_box.getPosition().x * 1.05, stats_box.getPosition().y + dimensions.height / 2, dimensions.width, dimensions.height);
+		portait.draw(g);
+
+		// Display AD stat
+		Vertex stat_start_pos = new Vertex(portait.getPosition().x + portait.getDimensions().width + 20, portait.getPosition().y - 30);
+
+		Shado.Image ad_icon = new Shado.Image("DataFiles/Images/ad.png", stat_start_pos.x, stat_start_pos.y, 20, 20);
+		Shado.Text ad_text = new Shado.Text(Integer.toString((int) this.ad), ad_icon.getPosition().x + ad_icon.getDimensions().width + 5, ad_icon.getCenter().y + 5);
+		ad_icon.draw(g);
+		ad_text.draw(g);
+
+		// Display AP stat
+		Shado.Image ap_icon = new Shado.Image("DataFiles/Images/ability_power.png", ad_text.getPosition().x + 50, ad_icon.getPosition().y, 20, 20);
+		Shado.Text ap_text = new Shado.Text(Integer.toString((int) this.ap), ap_icon.getPosition().x + ap_icon.getDimensions().width + 5, ad_text.getPosition().y);
+		ap_icon.draw(g);
+		ap_text.draw(g);
 	}
 
 	// Getters

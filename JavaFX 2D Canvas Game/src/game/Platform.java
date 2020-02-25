@@ -16,7 +16,7 @@ public class Platform extends GameObject {
 
 	public static List<Platform> allPlatforms = new ArrayList<Platform>();
 
-	public Platform(float x, float y, float w, float h) {
+	public Platform(double x, double y, double w, double h) {
 		super("platform");
 		position.x = x;
 		position.y = y;
@@ -28,7 +28,7 @@ public class Platform extends GameObject {
 	}
 
 	public Platform(Vertex v, Dimension d) {
-		this((float) v.x, (float) v.y, d.width, d.height);
+		this(v.x, v.y, d.width, d.height);
 	}
 
 	/**

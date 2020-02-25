@@ -1,0 +1,15 @@
+hp: 1000			// Monster's health
+maxHp: 1000			// Monster's max health
+hpRegen: 0.001		// Monster's health regenration per frame
+energy: 200.0		// Monster's energy
+maxEnergy: 200		// Monster's max energy
+energyRegen: 0.01	// Monster's energy regenration per frame
+ad: 60				// Monster's attack damage
+armor: 12			// Monster's armor
+range: 500			// Monster's attack range
+ms: 10				// Monster mouvemenet speed
+jumpCost: 20.0		// Monster's energy cost per jump
+ap: 0				// Monster's ability power
+magicResist: 12		// Monster's magic resist
+attackSpeed: 0.69	// Monster's attacks per second
+critChance: 0		// Monster's critical strike chance

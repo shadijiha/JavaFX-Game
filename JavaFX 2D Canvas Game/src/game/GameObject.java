@@ -21,7 +21,10 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	protected Vector velocity;
 	protected Dimension dimensions;
 	protected Shado.Shape shape;
+
+	protected String texture_path;
 	protected Shado.Image texture;
+
 
 	public static List<GameObject> allGameObject = new ArrayList<GameObject>();
 
@@ -139,6 +142,7 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 
 	public void setTexture(String path) {
 		texture = new Shado.Image(path, (float) position.x, (float) position.y, dimensions.width, dimensions.height);
+		texture_path = path;
 	}
 
 	// Getters

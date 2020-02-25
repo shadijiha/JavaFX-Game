@@ -4,10 +4,7 @@
 
 package shapes;
 
-import game.Bullet;
-import game.Platform;
-import game.Player;
-import game.Timer;
+import game.*;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -22,7 +19,7 @@ import java.util.List;
 public abstract class Game {
 
 	private static int GROUND_LEVEL = 400;
-	public static Player player = new Player(50, 0, "DataFiles/playerInfo.shado");
+	public static Player player = new Player(50, 0, "DataFiles/playerInfo.son");
 
 	private static Player selectedHUD = player;
 
@@ -31,6 +28,10 @@ public abstract class Game {
 
 	// This list holds all monsters created
 	private static List<Player> allMonsters;
+
+	// This Rectangle is the description box for whenever user hovers over something that needs explanination
+	private static final Shado.Rectangle DESCRIPTION_BOX = new Shado.Rectangle();
+	private static final Shado.Text DESCRIPTION_TEXT = new Shado.Text();
 
 	public static void initialize(Canvas c) {
 
@@ -64,7 +65,7 @@ public abstract class Game {
 
 		// Add monsters
 		for (int i = 0; i < 2; i++) {
-			var monster = new Player(200 * i + 500, 1, "DataFiles/monster.shado");
+			var monster = new Player(200 * i + 500, 1, "DataFiles/monster.son");
 			monster.getShape().setFill(Color.PURPLE);
 			monster.setTexture("DataFiles/Images/monster.png");
 			monster.onClick(e -> selectedHUD = (Player) e);
@@ -161,6 +162,15 @@ public abstract class Game {
 
 		// Draw Player HUD
 		selectedHUD.drawHUD(g, c);
+
+		// Show description box
+		//DESCRIPTION_BOX.draw(g);
+		//DESCRIPTION_TEXT.draw(g);
+	}
+
+	public static void showDescription(Shado.Shape element, String text) throws CodeNotImplementedException {
+		// TODO: implement code
+		throw new CodeNotImplementedException("?XD");
 	}
 
 	public static void moveWorld(double amount) {
