@@ -1,6 +1,11 @@
-hp: 1000
-maxHp: 1000
-energy: 200
-maxEnergy: 200
-ad: 60
-armor: 12
+hp: 1000			// Player's health
+maxHp: 1000			// Player's max health
+hpRegen: 0.001		// player's health regenration per frame
+energy: 200.0		// player's energy
+maxEnergy: 200		// Player's max energy
+energyRegen: 0.01	// player's energy regenration per frame
+ad: 60				// Player's attack damage
+armor: 12			// player's armor
+range: 500			// player's attack range
+ms: 10				// player mouvemenet speed
+jumpCost: 20.0		// player's energy cost per jump

@@ -20,19 +20,19 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class ReadDateFile {
+public class ReadShadoFile {
 
 	private List<List<String>> data = new ArrayList<>();
 	private String filename;
 	private Logger logger;
 
-	public ReadDateFile(String filename, Logger logger) {
+	public ReadShadoFile(String filename, Logger logger) {
 		this.filename = filename;
 		this.logger = logger;
-		readJSONFile();
+		readDataFile();
 	}
 
-	private void readJSONFile() {
+	private void readDataFile() {
 
 		List<String> temp = new ArrayList<>();
 
@@ -48,6 +48,11 @@ public class ReadDateFile {
 			// Separate attributes from data
 			for (String s : temp) {
 				String[] sperated = s.split(":");
+
+				// Rmove comments
+				for (int i = 0; i < sperated.length; i++)
+					sperated[i] = sperated[i].replaceAll("\\/\\/.*", "");
+
 				data.add(Arrays.asList(sperated));
 			}
 
@@ -56,7 +61,7 @@ public class ReadDateFile {
 		}
 	}
 
-	public String get(String attribute) {
+	public String get(String attribute, boolean removeWhiteSpace) {
 
 		// Find the element the matches the attribute
 		List<List<String>> result = data.stream()
@@ -70,6 +75,14 @@ public class ReadDateFile {
 		}
 
 		// Return only the first result of the search without the attribute itself (for example, hp: 80 --> will return; 80)
-		return result.get(0).get(1).replaceAll("\"", "");
+		String temp = result.get(0).get(1).replaceAll("\"", "");
+		if (removeWhiteSpace)
+			return temp.replaceAll("\\s", "");
+		else
+			return temp;
+	}
+
+	public String get(String attribute) {
+		return get(attribute, false);
 	}
 }

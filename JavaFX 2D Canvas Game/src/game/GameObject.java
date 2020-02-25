@@ -13,7 +13,7 @@ import shapes.Shado;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GameObject {
+public abstract class GameObject extends Shado.EventListener<GameObject> {
 	protected String name;
 	protected int id;
 	protected boolean hidden;
@@ -21,6 +21,7 @@ public abstract class GameObject {
 	protected Vector velocity;
 	protected Dimension dimensions;
 	protected Shado.Shape shape;
+	protected Shado.Image texture;
 
 	public static List<GameObject> allGameObject = new ArrayList<GameObject>();
 
@@ -32,12 +33,43 @@ public abstract class GameObject {
 		this.velocity = new Vector(0, 0);
 		this.dimensions = new Dimension(0, 0);
 		this.shape = new Shado.Rectangle(position, dimensions);
+		this.texture = null;
 
 		allGameObject.add(this);
 	}
 
 	// Core
-	public abstract void draw(GraphicsContext g);
+	public void draw(GraphicsContext g) {
+		// Draw texture if it exists
+		if (texture != null)
+			texture.draw(g);
+		else
+			shape.draw(g);
+
+		// Handle click event
+		if (clickEvent != null) {
+			if (shape.collides(Mouse.getLastClick().x, Mouse.getLastClick().y, 2, 2)) {
+				clickEvent.accept(this);
+				Mouse.resetLastClicked();
+			}
+		}
+
+		// Handle Hover event
+		if (hoverEvent != null) {
+			if (shape.collides(Mouse.getX(), Mouse.getY(), 2, 2)) {
+				hoverEvent.accept(this);
+				outEventConsumed = false;
+			}
+		}
+
+		// Handle mouse out event
+		if (mouseOutEvent != null) {
+			if (!shape.collides(Mouse.getX(), Mouse.getY(), 2, 2) && !outEventConsumed) {
+				mouseOutEvent.accept(this);
+				outEventConsumed = true;
+			}
+		}
+	}
 
 	/**
 	 * Moves the object depending on its velocity
@@ -105,6 +137,10 @@ public abstract class GameObject {
 		dimensions.height = d.height;
 	}
 
+	public void setTexture(String path) {
+		texture = new Shado.Image(path, (float) position.x, (float) position.y, dimensions.width, dimensions.height);
+	}
+
 	// Getters
 
 	/**
@@ -155,5 +191,4 @@ public abstract class GameObject {
 	public Shado.Shape getShape() {
 		return this.shape;
 	}
-
 }

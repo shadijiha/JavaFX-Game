@@ -4,15 +4,54 @@
 
 package shapes;
 
+import game.Mouse;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import shadoMath.Vector;
 import shadoMath.Vertex;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.function.Consumer;
+
 public final class Shado {
 
-	public static abstract class Shape implements Cloneable {
+	// Prevent initialization of a Shado object
+	private Shado() {
+	}
+
+	public static class EventListener<E> {
+		// Events
+		protected Consumer<E> clickEvent;
+		protected Consumer<E> hoverEvent;
+		protected Consumer<E> mouseOutEvent;
+		protected boolean outEventConsumed;        // This variable is here to make sure that the onMouseOut event is applied only once (and not every frame)
+
+		protected EventListener() {
+			// Initialize events
+			clickEvent = null;
+			hoverEvent = null;
+			mouseOutEvent = null;
+			outEventConsumed = false;
+		}
+
+		// Events setters
+		public void onClick(Consumer<E> function) {
+			clickEvent = function;
+			Mouse.resetLastClicked();
+		}
+
+		public void onMouseOver(Consumer<E> function) {
+			hoverEvent = function;
+		}
+
+		public void onMouseOut(Consumer<E> function) {
+			mouseOutEvent = function;
+		}
+	}
+
+	public static abstract class Shape extends EventListener<Shado.Shape> implements Cloneable {
 		protected Vertex position;
 		protected Dimension dimensions;
 		protected Color fill;
@@ -20,6 +59,7 @@ public final class Shado {
 		protected int lineWidth;
 
 		protected Shape() {
+			super();
 			position = new Vertex();
 			dimensions = new Dimension();
 			lineWidth = 1;
@@ -32,7 +72,32 @@ public final class Shado {
 		 *
 		 * @param g The GraphicsContext of the canvas
 		 */
-		public abstract void draw(GraphicsContext g);
+		public void draw(GraphicsContext g) {
+
+			// Handle click event
+			if (clickEvent != null) {
+				if (collides(Mouse.getLastClick().x, Mouse.getLastClick().y, 2, 2)) {
+					clickEvent.accept(this);
+					Mouse.resetLastClicked();
+				}
+			}
+
+			// Handle Hover event
+			if (hoverEvent != null) {
+				if (collides(Mouse.getX(), Mouse.getY(), 2, 2)) {
+					hoverEvent.accept(this);
+					outEventConsumed = false;
+				}
+			}
+
+			// Handle mouse out event
+			if (mouseOutEvent != null) {
+				if (!collides(Mouse.getX(), Mouse.getY(), 2, 2) && !outEventConsumed) {
+					mouseOutEvent.accept(this);
+					outEventConsumed = true;
+				}
+			}
+		}
 
 		/**
 		 * @return Returns the area of the calling Shape
@@ -43,6 +108,12 @@ public final class Shado {
 			position.x += velocity.x;
 			position.y += velocity.y;
 		}
+
+		public void move(double x, double y) {
+			position.x += x;
+			position.y += y;
+		}
+
 
 		// Collision
 		public boolean collides(Shape other) {
@@ -61,6 +132,13 @@ public final class Shado {
 			} else {
 				return false;
 			}
+		}
+
+		public boolean collides(double x, double y, double w, double h) {
+			return x + w >= position.x
+					&& x <= position.x + dimensions.width
+					&& y + h >= position.y
+					&& y <= position.y + dimensions.height;
 		}
 
 		// Setters
@@ -221,11 +299,15 @@ public final class Shado {
 		 */
 		@Override
 		public void draw(GraphicsContext g) {
+			// Draw Shape
 			g.setFill(fill);
 			g.setStroke(stroke);
 			g.setLineWidth(lineWidth);
 			g.fillRect(position.x, position.y, dimensions.width, dimensions.height);
 			g.strokeRect(position.x, position.y, dimensions.width, dimensions.height);
+
+			// Handle events by calling the draw in Shado.Shape
+			super.draw(g);
 		}
 
 		/**
@@ -265,6 +347,9 @@ public final class Shado {
 			g.setLineWidth(lineWidth);
 			g.fillOval(position.x, position.y, dimensions.width, dimensions.height);
 			g.strokeOval(position.x, position.y, dimensions.width, dimensions.height);
+
+			// Handle events by calling the draw in Shado.Shape
+			super.draw(g);
 		}
 
 		@Override
@@ -328,6 +413,9 @@ public final class Shado {
 			g.setStroke(stroke);
 			g.setLineWidth(lineWidth);
 			g.strokeLine(position.x, position.y, dimensions.width, dimensions.height);
+
+			// Handle events by calling the draw in Shado.Shape
+			super.draw(g);
 		}
 
 		/**
@@ -419,11 +507,94 @@ public final class Shado {
 			g.setStroke(stroke);
 			g.fillText(text, position.x, position.y);
 			g.strokeText(text, position.x, position.y);
+
+			// Handle events by calling the draw in Shado.Shape
+			super.draw(g);
 		}
 
 		@Override
 		public float area() {
 			return 0.0f;
+		}
+	}
+
+	public static class Image extends Shape {
+
+		private FileInputStream path;
+		private javafx.scene.image.Image img;
+		private String source;
+		private File file;
+
+		public Image(String src, float x, float y, float w, float h) {
+			position.x = x;
+			position.y = y;
+			dimensions.width = w;
+			dimensions.height = h;
+			source = src;
+
+			// Get the absulte path and replace the disk name with "file"
+			// So instead of "D:/path/"
+			// We get "file:/path/"
+			file = new File(src);
+			img = new javafx.scene.image.Image(toFileProtocole(file.getAbsolutePath()));
+		}
+
+		private String toFileProtocole(String absolutPath) {
+			String[] absolute_path = file.getAbsolutePath().split("");
+			absolute_path[0] = "file";
+			return String.join("", absolute_path);
+		}
+
+		@Override
+		public void draw(GraphicsContext g) {
+			g.drawImage(img, position.x, position.y, dimensions.width, dimensions.height);
+
+			// Handle events by calling the draw in Shado.Shape
+			super.draw(g);
+		}
+
+		/**
+		 * Changes the position of the shape
+		 *
+		 * @param pos The new position
+		 * @return Returns the calling object
+		 */
+		@Override
+		public Image setPosition(final Vertex pos) {
+			this.position.x = pos.x;
+			this.position.y = pos.y;
+			return this;
+		}
+
+		/**
+		 * Changes the dimensions of the shape
+		 *
+		 * @param d The new dimensions
+		 * @return Returns the calling object
+		 */
+		@Override
+		public Image setDimensions(final Dimension d) {
+			this.dimensions.width = d.width;
+			this.dimensions.height = d.height;
+			img = new javafx.scene.image.Image(source, dimensions.width, dimensions.height, false, true);
+			return this;
+		}
+
+		/**
+		 * Changes the source of the drawn image
+		 *
+		 * @param path The new path of the image
+		 * @return Returns the calling object
+		 */
+		public Image setSource(String path) {
+			file = new File(path);
+			img = new javafx.scene.image.Image(toFileProtocole(file.getAbsolutePath()));
+			return this;
+		}
+
+		@Override
+		public float area() {
+			return dimensions.width * dimensions.width;
 		}
 	}
 }

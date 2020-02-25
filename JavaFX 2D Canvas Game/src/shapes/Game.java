@@ -7,7 +7,7 @@ package shapes;
 import game.Bullet;
 import game.Platform;
 import game.Player;
-import game.Time;
+import game.Timer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -22,24 +22,33 @@ import java.util.List;
 public abstract class Game {
 
 	private static int GROUND_LEVEL = 400;
-	public static Player player = new Player(50, 0);
+	public static Player player = new Player(50, 0, "DataFiles/playerInfo.shado");
+
+	private static Player selectedHUD = player;
 
 	// This list holds environment stuff (sun, sky, etc)
-	private static List<Shado.Shape> environment = new ArrayList<>();
+	private static List<Shado.Shape> environment;
 
 	// This list holds all monsters created
-	private static List<Player> allMonsters = new ArrayList<>();
+	private static List<Player> allMonsters;
 
 	public static void initialize(Canvas c) {
 
+		environment = new ArrayList<>();
+		allMonsters = new ArrayList<>();
+		Platform.allPlatforms = new ArrayList<>();
+
 		GROUND_LEVEL = (int) (c.getHeight() * 0.70);
 		player.setPosition(new Vertex(c.getWidth() * 0.20, 0));
+		player.setTexture("DataFiles/Images/player.png");
+		player.onClick(e -> selectedHUD = (Player) e);
 
 		// Draw ground
-		var ground = new Platform(-10000, GROUND_LEVEL, (float) c.getWidth() + 20000, (float) c.getHeight() - GROUND_LEVEL);
+		var ground = new Platform(-5000, GROUND_LEVEL, (float) c.getWidth() + 10000, (float) c.getHeight() - GROUND_LEVEL);
 		ground.setFill(Color.GREEN);
 		ground.setStroke(Color.GREEN);
 		ground.flagAsImmobile();
+		ground.setTexture("DataFiles/Images/grass.png");
 
 		// Draw sky
 		var sky = new Shado.Rectangle(-1000, 0, (float) c.getWidth() * 2, GROUND_LEVEL);
@@ -55,8 +64,10 @@ public abstract class Game {
 
 		// Add monsters
 		for (int i = 0; i < 2; i++) {
-			var monster = new Player(200 * i + 500, 1);
+			var monster = new Player(200 * i + 500, 1, "DataFiles/monster.shado");
 			monster.getShape().setFill(Color.PURPLE);
+			monster.setTexture("DataFiles/Images/monster.png");
+			monster.onClick(e -> selectedHUD = (Player) e);
 			allMonsters.add(monster);
 		}
 
@@ -149,12 +160,11 @@ public abstract class Game {
 				});
 
 		// Draw Player HUD
-		player.drawHUD(g, c);
-
+		selectedHUD.drawHUD(g, c);
 	}
 
 	public static void moveWorld(double amount) {
-		final double final_amount = amount * Time.deltaTime / 10;
+		final double final_amount = amount * Timer.deltaTime / 10;
 		// Move environment
 		environment.parallelStream()
 				.forEachOrdered(e -> {

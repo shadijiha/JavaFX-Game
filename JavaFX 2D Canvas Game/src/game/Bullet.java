@@ -4,7 +4,6 @@
 
 package game;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import shadoMath.Vector;
 import shadoMath.Vertex;
@@ -53,15 +52,5 @@ public class Bullet extends GameObject {
 	 */
 	public void setActivityTo(boolean a) {
 		active = a;
-	}
-
-	/**
-	 * Draws the bullet to the screen
-	 *
-	 * @param g The graphicsContext
-	 */
-	@Override
-	public void draw(GraphicsContext g) {
-		this.shape.draw(g);
 	}
 }

@@ -4,9 +4,11 @@
 
 package game;
 
+import dataGetters.ReadShadoFile;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import sample.Main;
 import shadoMath.Vertex;
 import shapes.Dimension;
 import shapes.Shado;
@@ -20,38 +22,61 @@ public class Player extends GameObject {
 
 	private List<Bullet> bullets = new ArrayList<>();
 
-	private double maxHp = 1000.0f;
-	private double hp = 500.0f;
-	private double hpRegen = 0.001f;
+	private double maxHp;
+	private double hp;
+	private double hpRegen;
 
-	private double maxEnergy = 200.0f;
-	private double energy = 200.0f;
-	private double energyRegen = 0.01f;
+	private double maxEnergy;
+	private double energy;
+	private double energyRegen;
 
-	private double ad = 60.0f;
-	private double armor = 23.0f;
-	private int range = 500;
+	private double ad;
+	private double armor;
+	private int range;
+	private double jumpCost;
+	private int ms;
 
 	private double gravity = 0.1;
 	private double lift = -5.0;
-	private float jumpCost = 20.0f;
-	private int ms = 10;
 
+	// Read properties from a file
+	private ReadShadoFile props;
 
-	public Player(int x, int y) {
+	public Player(int x, int y, String propsFileName) {
 		super("player");
 		position.x = x;
 		position.y = y;
-		dimensions.width = 50;
+		dimensions.width = 75;
 		dimensions.height = 150;
 		shape.setPosition(position);
 		shape.setDimensions(dimensions);
 		shape.setFill(Color.PINK);
+
+		props = new ReadShadoFile(propsFileName, Main.LOGGER);
+		initializeProps();
+
 		allPlayers.add(this);
 	}
 
-	public Player() {
-		this(0, 0);
+	public Player(String propsFileName) {
+		this(0, 0, propsFileName);
+	}
+
+	private void initializeProps() {
+		maxHp = Double.parseDouble(props.get("maxHp", true));
+		hp = Double.parseDouble(props.get("hp", true));
+		hpRegen = Double.parseDouble(props.get("hpRegen", true));
+
+		maxEnergy = Double.parseDouble(props.get("maxEnergy", true));
+		energy = Double.parseDouble(props.get("energy", true));
+		energyRegen = Double.parseDouble(props.get("energyRegen", true));
+
+		ad = Double.parseDouble(props.get("ad", true));
+		armor = Double.parseDouble(props.get("armor", true));
+		range = Integer.parseInt(props.get("range", true));
+		ms = Integer.parseInt(props.get("ms", true));
+
+		jumpCost = Double.parseDouble(props.get("jumpCost", true));
 	}
 
 	/**
@@ -61,6 +86,10 @@ public class Player extends GameObject {
 
 		// Apply gravity
 		this.force();
+
+		// Update texture position
+		if (texture != null)
+			texture.setPosition(position);
 
 		// Detect collisions with platform
 		Platform.allPlatforms.parallelStream()
@@ -79,20 +108,22 @@ public class Player extends GameObject {
 				});
 
 		// Regen energy
-		energy += energyRegen * Time.deltaTime;
-		hp += hpRegen * Time.deltaTime;
+		energy += energyRegen * Timer.deltaTime;
+		hp += hpRegen * Timer.deltaTime;
 
 		// Keep every stat normal
-		energy = energy > maxEnergy ? maxEnergy : energy;
-		hp = hp > maxHp ? maxHp : hp;
+		energy = Math.min(energy, maxEnergy);
+		energy = energy < 0 ? 0 : energy;
+		hp = Math.min(hp, maxHp);
+		hp = hp < 0 ? 0 : hp;
 	}
 
 	/**
 	 * Applies gravity the object
 	 */
 	private void force() {
-		this.velocity.y += this.gravity * Time.deltaTime / 10;
-		this.position.y += this.velocity.y * Time.deltaTime / 10;
+		this.velocity.y += this.gravity * Timer.deltaTime / 10;
+		this.position.y += this.velocity.y * Timer.deltaTime / 10;
 
 		if (this.position.y < 0) {
 			this.position.y = 0;
@@ -111,7 +142,7 @@ public class Player extends GameObject {
 			//!this.stunned &&
 			//!this.rooted
 		) {
-			this.velocity.y += this.lift * Time.deltaTime / 10;
+			this.velocity.y += this.lift * Timer.deltaTime / 10;
 			this.energy -= this.jumpCost;
 		}
 	}
@@ -199,7 +230,7 @@ public class Player extends GameObject {
 				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.75 - bar_height),
 				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
 
-		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", hp, maxHp, hpRegen * Time.deltaTime * Time.framerate()),
+		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", hp, maxHp, hpRegen * Timer.deltaTime * Timer.framerate()),
 				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2 - 20),
 				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80 - bar_height + main_HUD.getDimensions().height * 0.10 / 4));
 		hp_bar_text.draw(g);
@@ -208,7 +239,7 @@ public class Player extends GameObject {
 		drawEnergyBar(g,
 				new Vertex(main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10, main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80),
 				new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height));
-		var energy_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", energy, maxEnergy, energyRegen * Time.deltaTime * Time.framerate()),
+		var energy_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", energy, maxEnergy, energyRegen * Timer.deltaTime * Timer.framerate()),
 				(float) (main_HUD.getPosition().x + main_HUD.getDimensions().width * 0.10 + (main_HUD.getDimensions().width * 0.80) / 2 - 20),
 				(float) (main_HUD.getPosition().y + main_HUD.getDimensions().height * 0.80 + main_HUD.getDimensions().height * 0.15 / 2));
 		energy_bar_text.draw(g);
@@ -244,14 +275,5 @@ public class Player extends GameObject {
 	 */
 	public List<Bullet> getAllBullets() {
 		return bullets;
-	}
-
-	/**
-	 * Draws the object to the screen
-	 * @param g The GraphicsContext
-	 */
-	@Override
-	public void draw(GraphicsContext g) {
-		shape.draw(g);
 	}
 }

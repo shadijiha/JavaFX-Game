@@ -1,6 +1,7 @@
 package sample;
 
-import game.Time;
+import game.Mouse;
+import game.Timer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -29,7 +30,6 @@ public class Main extends Application {
 		}
 	}
 
-
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("Drawing Operations Test");
@@ -37,10 +37,22 @@ public class Main extends Application {
 		Canvas canvas = new Canvas(1920, 1080);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
+		// Register mouse position
+		canvas.setOnMouseMoved(event -> {
+			Mouse.setX(event.getX());
+			Mouse.setY(event.getY());
+		});
+
+		canvas.setOnMouseClicked(event -> {
+			Mouse.setLastClick(event.getX(), event.getY());
+		});
+
 		// Initialize shapes to draw
 		Game.initialize(canvas);
 
-		Shado.Text FPS_TEXT = new Shado.Text("Loading...", 10, 30);
+		final Shado.Text FPS_TEXT = new Shado.Text("Loading...", 10, 30);
+		final Shado.Image reload = new Shado.Image("DataFiles/Images/reload.png", 10, 10, 100, 100);
+		reload.onClick(e -> Game.initialize(canvas));
 
 		// clear the canvas and Draw shapes
 		new AnimationTimer() {
@@ -57,16 +69,22 @@ public class Main extends Application {
 
 				long elapsedNanos = now - oldFrameTime;
 				long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
-				Time.setFramerate(1_000_000_000.0 / elapsedNanosPerFrame);
+				Timer.setFramerate(1_000_000_000.0 / elapsedNanosPerFrame);
 
-				if (Time.framerate() >= 1) {
-					Time.deltaTime = elapsedNanos / 100000000D;
-					FPS_TEXT.setText(String.format("%.3f FPS", Time.framerate()));
+				if (Timer.framerate() >= 1) {
+					Timer.deltaTime = elapsedNanos / 100000000D;
+					FPS_TEXT.setText(String.format("%.3f FPS", Timer.framerate()));
 
 					// Increment the time elapsed since program start
-					Time.addTime(Time.deltaTime);
+					Timer.addTime(Timer.deltaTime);
 				}
+
+				// Draw FPS text
 				FPS_TEXT.draw(gc);
+
+				// Draw reload button
+				reload.draw(gc);
+
 			}
 		}.start();
 

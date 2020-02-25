@@ -3,7 +3,6 @@
  */
 package game;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import shadoMath.Vertex;
 import shapes.Dimension;
@@ -61,10 +60,10 @@ public class Platform extends GameObject {
 		return shape.collides(p.getShape());
 	}
 
-	@Override
-	public void draw(GraphicsContext g) {
-		shape.draw(g);
-	}
+//	@Override
+//	public void draw(GraphicsContext g) {
+//
+//	}
 
 	// Getters
 	public boolean isImmobile() {
