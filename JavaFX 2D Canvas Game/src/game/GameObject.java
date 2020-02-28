@@ -5,6 +5,8 @@
 package game;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import sample.Main;
 import shadoMath.Vector;
 import shadoMath.Vertex;
 import shapes.Dimension;
@@ -16,7 +18,6 @@ import java.util.List;
 public abstract class GameObject extends Shado.EventListener<GameObject> {
 	protected String name;
 	protected int id;
-	protected boolean hidden;
 	protected Vertex position;
 	protected Vector velocity;
 	protected Dimension dimensions;
@@ -25,29 +26,44 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	protected String texture_path;
 	protected Shado.Image texture;
 
+	protected boolean hidden;
+	protected boolean deleted;
 
 	public static List<GameObject> allGameObject = new ArrayList<GameObject>();
 
 	protected GameObject(String name) {
 		this.name = name;
 		this.id = (int) (Math.random() * Integer.MAX_VALUE);
-		this.hidden = false;
 		this.position = new Vertex(0, 0);
 		this.velocity = new Vector(0, 0);
 		this.dimensions = new Dimension(0, 0);
 		this.shape = new Shado.Rectangle(position, dimensions);
 		this.texture = null;
 
+		this.hidden = false;
+		this.deleted = false;
+
 		allGameObject.add(this);
 	}
 
 	// Core
 	public void draw(GraphicsContext g) {
+
+		// Don't draw or evaluate events if the object is deleted
+		if (deleted)
+			return;
+
 		// Draw texture if it exists
-		if (texture != null)
+		if (texture != null) {
 			texture.draw(g);
-		else
+
+			// If debug mode is on draw the hitbox
+			if (Main.LOGGER.isDebugMode()) {
+				new Shado.Rectangle(position, dimensions).setFill(Color.TRANSPARENT).setStroke(Color.BLACK).setLineWidth(2).draw(g);
+			}
+		} else {
 			shape.draw(g);
+		}
 
 		// Handle click event
 		if (clickEvent != null) {
@@ -75,15 +91,6 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	}
 
 	/**
-	 * Moves the object depending on its velocity
-	 */
-	public void move() {
-		position.x += velocity.x;
-		position.y += velocity.y;
-		shape.move(velocity);
-	}
-
-	/**
 	 * Moves an object by a certain X and Y
 	 *
 	 * @param x The x offset to add
@@ -92,7 +99,17 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	public void move(double x, double y) {
 		position.x += x;
 		position.y += y;
-		shape.move(new Vector(x, y));
+		shape.move(x, y);
+
+		if (texture != null)
+			texture.move(x, y);
+	}
+
+	/**
+	 * Moves the object depending on its velocity
+	 */
+	public void move() {
+		this.move(velocity.x, velocity.y);
 	}
 
 	// Setters
@@ -116,8 +133,9 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	 *
 	 * @param vel The new velocity
 	 */
-	public void setVelocity(Vector vel) {
+	public GameObject setVelocity(Vector vel) {
 		this.velocity = vel;
+		return this;
 	}
 
 	/**
@@ -125,9 +143,10 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	 *
 	 * @param v The new position
 	 */
-	public void setPosition(Vertex v) {
+	public GameObject setPosition(Vertex v) {
 		position.x = v.x;
 		position.y = v.y;
+		return this;
 	}
 
 	/**
@@ -135,14 +154,25 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	 *
 	 * @param d The new dimensions
 	 */
-	public void setDimensions(Dimension d) {
+	public GameObject setDimensions(Dimension d) {
 		dimensions.width = d.width;
 		dimensions.height = d.height;
+		return this;
 	}
 
-	public void setTexture(String path) {
-		texture = new Shado.Image(path, (float) position.x, (float) position.y, dimensions.width, dimensions.height);
+	public GameObject setTexture(String path) {
+		texture = new Shado.Image(path, position.x, position.y, dimensions.width, dimensions.height);
 		texture_path = path;
+		return this;
+	}
+
+	/**
+	 * To avoid exception with multithreading, whenever an object is no longer needed, call this method.
+	 * <p>
+	 * The delete buffer runs periodically and deletes all unneeded elements
+	 */
+	public void delete() {
+		deleted = true;
 	}
 
 	// Getters
@@ -166,6 +196,10 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	 */
 	public boolean isHidden() {
 		return hidden;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
 	}
 
 	/**

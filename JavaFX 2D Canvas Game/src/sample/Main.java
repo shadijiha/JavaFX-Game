@@ -32,6 +32,10 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+
+		// Turn on debug mode
+		LOGGER.setDebugModeTo(false);
+
 		primaryStage.setTitle("Drawing Operations Test");
 		Group root = new Group();
 		Canvas canvas = new Canvas(1920, 1080);
@@ -91,7 +95,7 @@ public class Main extends Application {
 
 		root.getChildren().add(canvas);
 		Scene scene = new Scene(root);
-		Game.handleEvents(scene);
+		Game.handleEvents(scene, gc);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

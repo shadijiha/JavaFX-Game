@@ -4,11 +4,12 @@
 
 package game;
 
-import dataGetters.ReadShadoObjectNotationFile;
+import dataGetters.ReadSONFile;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import sample.Main;
+import shadoMath.Vector;
 import shadoMath.Vertex;
 import shapes.Dimension;
 import shapes.Shado;
@@ -38,6 +39,7 @@ public class Player extends GameObject {
 
 	private double ad;
 	private double armor;
+	private double lifeSteal;
 
 	private int range;
 	private double jumpCost;
@@ -45,9 +47,10 @@ public class Player extends GameObject {
 
 	private double gravity = 0.1;
 	private double lift = -5.0;
+	protected Vector bulletVelocity;
 
 	// Read properties from a file
-	private ReadShadoObjectNotationFile props;
+	private ReadSONFile props;
 
 	public Player(int x, int y, String propsFileName) {
 		super("player");
@@ -59,7 +62,7 @@ public class Player extends GameObject {
 		shape.setDimensions(dimensions);
 		shape.setFill(Color.PINK);
 
-		props = new ReadShadoObjectNotationFile(propsFileName, Main.LOGGER);
+		props = new ReadSONFile(propsFileName, Main.LOGGER);
 		initializeProps();
 
 		allPlayers.add(this);
@@ -69,6 +72,9 @@ public class Player extends GameObject {
 		this(0, 0, propsFileName);
 	}
 
+	/**
+	 * Gets the stats data of the object from the specified file
+	 */
 	private void initializeProps() {
 		maxHp = Double.parseDouble(props.get("maxHp", true));
 		hp = Double.parseDouble(props.get("hp", true));
@@ -91,6 +97,11 @@ public class Player extends GameObject {
 		ms = Integer.parseInt(props.get("ms", true));
 
 		jumpCost = Double.parseDouble(props.get("jumpCost", true));
+
+		bulletVelocity = new Vector(Double.parseDouble(props.get("bulletVelocityX", true)),
+				Double.parseDouble(props.get("bulletVelocityY", true)));
+
+		lifeSteal = Double.parseDouble(props.get("lifeSteal", true));
 	}
 
 	/**
@@ -165,7 +176,10 @@ public class Player extends GameObject {
 	 * Shoots a bullet
 	 */
 	public void shoot() {
-		bullets.add(new Bullet(this));
+		var bullet = new Bullet(this);
+		bullet.setTexture("DataFiles/Images/weapon.png");
+
+		bullets.add(bullet);
 	}
 
 	/**
@@ -175,9 +189,40 @@ public class Player extends GameObject {
 	 */
 	public double damage(Player source) {
 		double reduction = armor / (100 + armor);
-		double temp = source.ad * (1 - reduction);
-		hp -= temp;
-		return temp;
+		double finalDamage = source.ad * (1 - reduction);
+
+		// See if the damage crits
+		if (Math.random() <= source.critChance) {
+			finalDamage *= 2;
+
+			// Draw the damage dealt
+			new Info(Integer.toString((int) finalDamage),
+					this.position,
+					Vector.fromAngle(Math.random() * Math.PI * 2),
+					Color.ORANGE,
+					"DataFiles/Images/Critical_strike_chance.png");
+
+			// Play crit sound
+			new Audio("DataFiles/sounds/crit sound.mp3").setVolume(0.1).play();
+		}
+
+		hp -= finalDamage;
+
+		// Apply life steal to the source
+		source.heal(finalDamage * source.lifeSteal);
+
+
+		return finalDamage;
+	}
+
+	/**
+	 * Heals (Increment the hp) the calling object by a specific amount
+	 * @param amount The amount to heal
+	 * @return Returns the amount healed
+	 */
+	public double heal(double amount) {
+		this.hp += amount;
+		return amount;
 	}
 
 	/**
@@ -286,6 +331,55 @@ public class Player extends GameObject {
 		Shado.Text ap_text = new Shado.Text(Integer.toString((int) this.ap), ap_icon.getPosition().x + ap_icon.getDimensions().width + 5, ad_text.getPosition().y);
 		ap_icon.draw(g);
 		ap_text.draw(g);
+
+		// Display Armor stat
+		Shado.Image armor_icon = new Shado.Image("DataFiles/Images/armor.png", stat_start_pos.x, stat_start_pos.y + ad_icon.getDimensions().height * 3, 20, 20);
+		Shado.Text armor_text = new Shado.Text(Integer.toString((int) this.armor), armor_icon.getPosition().x + armor_icon.getDimensions().width + 5, armor_icon.getCenter().y + 5);
+		armor_icon.draw(g);
+		armor_text.draw(g);
+
+		// Display magic resist stat
+		Shado.Image mr_icon = new Shado.Image("DataFiles/Images/mr.png", ap_icon.getPosition().x, armor_icon.getPosition().y, 20, 20);
+		Shado.Text mr_text = new Shado.Text(Integer.toString((int) this.mr), mr_icon.getPosition().x + mr_icon.getDimensions().width + 5, mr_icon.getCenter().y + 5);
+		mr_icon.draw(g);
+		mr_text.draw(g);
+
+		// Display attack speed stat
+		Shado.Image as_icon = new Shado.Image("DataFiles/Images/attack_speed.png", armor_icon.getPosition().x, armor_icon.getPosition().y + armor_icon.getDimensions().height * 3, 20, 20);
+		Shado.Text as_text = new Shado.Text(Double.toString(this.attackSpeed), as_icon.getPosition().x + as_icon.getDimensions().width + 5, as_icon.getCenter().y + 5);
+		as_icon.draw(g);
+		as_text.draw(g);
+
+		// Display life steal stat
+		Shado.Image lifesteal_icon = new Shado.Image("DataFiles/Images/lifeSteal.png", mr_icon.getPosition().x, mr_icon.getPosition().y + mr_icon.getDimensions().height * 3, 20, 20);
+		Shado.Text lifesteal_text = new Shado.Text(Integer.toString((int) (this.lifeSteal * 100)) + "%",
+				lifesteal_icon.getPosition().x + lifesteal_icon.getDimensions().width + 5, lifesteal_icon.getCenter().y + 5);
+		lifesteal_icon.draw(g);
+		lifesteal_text.draw(g);
+
+		// Display range stat
+		Shado.Image range_icon = new Shado.Image("DataFiles/Images/range.png", as_icon.getPosition().x, as_icon.getPosition().y + as_icon.getDimensions().height * 3, 20, 20);
+		Shado.Text range_text = new Shado.Text(Integer.toString(this.range), range_icon.getPosition().x + range_icon.getDimensions().width + 5, range_icon.getCenter().y + 5);
+		range_icon.draw(g);
+		range_text.draw(g);
+
+		// Display Crit chance stat
+		Shado.Image crit_icon = new Shado.Image("DataFiles/Images/crit.png", lifesteal_icon.getPosition().x, lifesteal_icon.getPosition().y + lifesteal_icon.getDimensions().height * 3, 20, 20);
+		Shado.Text crit_text = new Shado.Text(Integer.toString((int) (this.critChance * 100)) + "%", crit_icon.getPosition().x + crit_icon.getDimensions().width + 5, crit_icon.getCenter().y + 5);
+		crit_icon.draw(g);
+		crit_text.draw(g);
+
+
+	}
+
+	public void drawRange(GraphicsContext g) {
+
+		g.setGlobalAlpha(0.7);
+
+		new Shado.Circle(position.x, position.y, range).setFill(Color.PURPLE).draw(g);
+
+		g.setGlobalAlpha(1);
+
 	}
 
 	// Getters

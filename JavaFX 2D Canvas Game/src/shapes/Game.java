@@ -11,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import shadoMath.Util;
 import shadoMath.Vertex;
 
 import java.util.ArrayList;
@@ -76,10 +77,15 @@ public abstract class Game {
 		for (int i = 0; i < 1; i++) {
 			var platform = new Platform(150 * i + 400, 50 * i + 300, 100, 25);
 			platform.setFill(Color.LIGHTGRAY);
+			platform.setTexture("DataFiles/Images/platforme.png");
 		}
 	}
 
 	public static void render(GraphicsContext g, Canvas c) {
+
+		// Delete all inwanted elements
+		Game.deleteElements();
+
 		// Render sky
 		Game.environment.parallelStream()
 				.forEachOrdered(e -> e.draw(g));
@@ -141,6 +147,21 @@ public abstract class Game {
 
 				});
 
+		// Draw all infos in the game
+		Info.allInfos.parallelStream()
+				.filter(info -> !info.isHidden())
+				.forEachOrdered(info -> info.draw(g));
+
+		// Draw Player HUD
+		selectedHUD.drawHUD(g, c);
+
+		// Show description box
+		//DESCRIPTION_BOX.draw(g);
+		//DESCRIPTION_TEXT.draw(g);
+	}
+
+	public static void deleteElements() {
+
 		// Go over all the bullets of the player and delete all inactive once
 		List<Bullet> player_bullets = player.getAllBullets();
 		for (int i = player_bullets.size() - 1; i >= 0; i--) {
@@ -148,6 +169,7 @@ public abstract class Game {
 				player_bullets.remove(i);
 			}
 		}
+
 
 		// Go over all the bullets of all Monsters and delete all inactive once
 		allMonsters.parallelStream()
@@ -160,12 +182,9 @@ public abstract class Game {
 					}
 				});
 
-		// Draw Player HUD
-		selectedHUD.drawHUD(g, c);
+		// Go over all deleted info and delete them
+		Util.delete_if(Info.allInfos, GameObject::isDeleted);
 
-		// Show description box
-		//DESCRIPTION_BOX.draw(g);
-		//DESCRIPTION_TEXT.draw(g);
 	}
 
 	public static void showDescription(Shado.Shape element, String text) throws CodeNotImplementedException {
@@ -178,7 +197,7 @@ public abstract class Game {
 		// Move environment
 		environment.parallelStream()
 				.forEachOrdered(e -> {
-					e.getPosition().x += final_amount * 0.15;
+					e.move(final_amount * 0.15, 0);
 				});
 
 		// Move monsters and their bullets
@@ -200,10 +219,12 @@ public abstract class Game {
 
 		// Move all bullets of player
 		player.getAllBullets().parallelStream()
-				.forEachOrdered(e -> e.move(final_amount, 0));
+				.forEachOrdered(bullet -> {
+					bullet.move(final_amount, 0);
+				});
 	}
 
-	public static void handleEvents(Scene scene) {
+	public static void handleEvents(Scene scene, GraphicsContext g) {
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
@@ -218,6 +239,9 @@ public abstract class Game {
 						break;
 					case D:
 						moveWorld(-1 * player.getMS());
+						break;
+					case C:
+						selectedHUD.drawRange(g);
 						break;
 					case SPACE:
 						player.shoot();

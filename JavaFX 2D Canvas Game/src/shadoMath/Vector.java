@@ -118,6 +118,14 @@ public class Vector implements Cloneable {
 	}
 
 	/**
+	 * Creates a vector from a specific angle in RADIANS
+	 * @return Returns a unit vector
+	 */
+	public static Vector fromAngle(double angle) {
+		return new Vector(Math.cos(angle), Math.sin(angle));
+	}
+
+	/**
 	 * multiplies all the coodinates by a value <b>scale</b>
 	 *
 	 * @param scale The value you want to multiply the vector with

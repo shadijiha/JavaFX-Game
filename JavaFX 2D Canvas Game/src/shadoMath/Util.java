@@ -4,6 +4,8 @@ import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class Util {
 
@@ -73,5 +75,12 @@ public class Util {
 		Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
 		calendar.setTime(date);   // assigns calendar to given date
 		return calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
+	}
+
+	public static <T> void delete_if(List<T> list, Predicate<T> condition) {
+		for (int i = list.size() - 1; i >= 0; i--) {
+			if (condition.test(list.get(i)))
+				list.remove(i);
+		}
 	}
 }

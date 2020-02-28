@@ -5,7 +5,6 @@
 package game;
 
 import javafx.scene.paint.Color;
-import shadoMath.Vector;
 import shadoMath.Vertex;
 import shapes.Dimension;
 
@@ -25,8 +24,7 @@ public class Bullet extends GameObject {
 		this.shape.setDimensions(this.dimensions);
 		this.shape.setFill(Color.ORANGE);
 
-		this.velocity.x = 2;
-		this.velocity.y = 0;
+		this.velocity = source.bulletVelocity;
 	}
 
 	/**
@@ -35,7 +33,10 @@ public class Bullet extends GameObject {
 	public void update() {
 		position.x += velocity.x;
 		position.y += velocity.y;
-		shape.move(new Vector(velocity));
+		shape.move(velocity);
+
+		if (texture != null)
+			texture.move(velocity);
 	}
 
 	/**

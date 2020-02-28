@@ -23,6 +23,8 @@ public class Logger implements AutoCloseable, Flushable {
 	private final String GREEN = "\\u001b[32m";
 	private final String RESET = "\\u001b[0m";
 
+	private boolean debug_mode = false;
+
 	public Logger(boolean overwrite) {
 		this.overwrite = overwrite;
 		try {
@@ -83,6 +85,14 @@ public class Logger implements AutoCloseable, Flushable {
 
 		System.out.printf(final_msg);
 		buffer.add(final_msg);
+	}
+
+	public void setDebugModeTo(boolean mode) {
+		debug_mode = mode;
+	}
+
+	public boolean isDebugMode() {
+		return debug_mode;
 	}
 
 	// Private stuff

@@ -114,7 +114,6 @@ public final class Shado {
 			position.y += y;
 		}
 
-
 		// Collision
 		public boolean collides(Shape other) {
 			if (this instanceof Rectangle && other instanceof Rectangle) {
@@ -555,20 +554,14 @@ public final class Shado {
 			// So instead of "D:/path/"
 			// We get "file:/path/"
 			file = new File(src);
-			img = new javafx.scene.image.Image(toFileProtocole(file.getAbsolutePath()));
-		}
-
-		private String toFileProtocole(String absolutPath) {
-			String[] absolute_path = file.getAbsolutePath().split("");
-			absolute_path[0] = "file";
-			return String.join("", absolute_path);
+			img = new javafx.scene.image.Image(String.valueOf(file.toURI()));
 		}
 
 		/**
 		 * @return Returns the absolute path of the Shado.Image with disk name replaced with "file:/"
 		 */
 		public String getImageAbsolutePath() {
-			return toFileProtocole(file.getAbsolutePath());
+			return String.valueOf(file.toURI());
 		}
 
 		@Override
@@ -614,7 +607,7 @@ public final class Shado {
 		 */
 		public Image setSource(String path) {
 			file = new File(path);
-			img = new javafx.scene.image.Image(toFileProtocole(file.getAbsolutePath()));
+			img = new javafx.scene.image.Image(String.valueOf(file.toURI()));
 			return this;
 		}
 
