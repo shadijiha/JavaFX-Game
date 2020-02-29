@@ -5,11 +5,8 @@
 package shapes;
 
 import game.*;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import shadoMath.Util;
 import shadoMath.Vertex;
@@ -19,10 +16,16 @@ import java.util.List;
 
 public abstract class Game {
 
+	// What resolution the game was made in (to calculate scaling in Shado.Shape)
+	public static final double WIDTH_RESOLUTION_ON_DESIGN = 1920.0;
+	public static final double HEIGHT_RESOLUTION_ON_DESIGN = 1080.0;
+
+	// ==========================================
 	private static int GROUND_LEVEL = 400;
 	public static Player player = new Player(50, 0, "DataFiles/playerInfo.son");
 
 	private static Player selectedHUD = player;
+	private static boolean show_selected_HUD_range = false;
 
 	// This list holds environment stuff (sun, sky, etc)
 	private static List<Shado.Shape> environment;
@@ -30,7 +33,7 @@ public abstract class Game {
 	// This list holds all monsters created
 	private static List<Player> allMonsters;
 
-	// This Rectangle is the description box for whenever user hovers over something that needs explanination
+	// This Rectangle is the description box for whenever user hovers over something that needs explanation
 	private static final Shado.Rectangle DESCRIPTION_BOX = new Shado.Rectangle();
 	private static final Shado.Text DESCRIPTION_TEXT = new Shado.Text();
 
@@ -81,7 +84,12 @@ public abstract class Game {
 		}
 	}
 
-	public static void render(GraphicsContext g, Canvas c) {
+	/**
+	 * Renders all game components to the screen
+	 *
+	 * @param g The canvas on which to render
+	 */
+	public static void render(Canvas g) {
 
 		// Delete all inwanted elements
 		Game.deleteElements();
@@ -153,33 +161,28 @@ public abstract class Game {
 				.forEachOrdered(info -> info.draw(g));
 
 		// Draw Player HUD
-		selectedHUD.drawHUD(g, c);
+		selectedHUD.drawHUD(g);
+		if (show_selected_HUD_range)
+			selectedHUD.drawRange(g);
 
 		// Show description box
 		//DESCRIPTION_BOX.draw(g);
 		//DESCRIPTION_TEXT.draw(g);
 	}
 
+	/**
+	 * Goes over player's and all monster's bullets and deletes all inactive onces
+	 * Goes over all infos and deletes all once marked as deleted
+	 */
 	public static void deleteElements() {
 
 		// Go over all the bullets of the player and delete all inactive once
-		List<Bullet> player_bullets = player.getAllBullets();
-		for (int i = player_bullets.size() - 1; i >= 0; i--) {
-			if (!player_bullets.get(i).isActive()) {
-				player_bullets.remove(i);
-			}
-		}
-
+		Util.delete_if(player.getAllBullets(), bullet -> !bullet.isActive());
 
 		// Go over all the bullets of all Monsters and delete all inactive once
 		allMonsters.parallelStream()
 				.forEachOrdered(monster -> {
-					List<Bullet> monster_bullets = monster.getAllBullets();
-					for (int i = monster_bullets.size() - 1; i >= 0; i--) {
-						if (!monster_bullets.get(i).isActive()) {
-							monster_bullets.remove(i);
-						}
-					}
+					Util.delete_if(monster.getAllBullets(), bullet -> !bullet.isActive());
 				});
 
 		// Go over all deleted info and delete them
@@ -187,11 +190,16 @@ public abstract class Game {
 
 	}
 
-	public static void showDescription(Shado.Shape element, String text) throws CodeNotImplementedException {
+	public static void showDescription(Shado.Shape element, String text) throws Exception {
 		// TODO: implement code
-		throw new CodeNotImplementedException("?XD");
+		throw new Exception("Code hasn't been implemented yet!");
 	}
 
+	/**
+	 * Moves all elements except Player by a certain amount
+	 *
+	 * @param amount The amount to move all elements
+	 */
 	public static void moveWorld(double amount) {
 		final double final_amount = amount * Timer.deltaTime / 10;
 		// Move environment
@@ -224,29 +232,39 @@ public abstract class Game {
 				});
 	}
 
-	public static void handleEvents(Scene scene, GraphicsContext g) {
-		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent event) {
-				switch (event.getCode()) {
-					case W:
-						player.jump();
-						break;
-					case S:
-						break;
-					case A:
-						moveWorld(player.getMS());
-						break;
-					case D:
-						moveWorld(-1 * player.getMS());
-						break;
-					case C:
-						selectedHUD.drawRange(g);
-						break;
-					case SPACE:
-						player.shoot();
-						break;
-				}
+	/**
+	 * Handles the KeyPress and KeyRelease Events
+	 *
+	 * @param scene The scene on which the events must be handled
+	 */
+	public static void handleEvents(Scene scene) {
+		scene.setOnKeyPressed(event -> {
+			switch (event.getCode()) {
+				case W:
+					player.jump();
+					break;
+				case S:
+					break;
+				case A:
+					moveWorld(player.getMS());
+					break;
+				case D:
+					moveWorld(-1 * player.getMS());
+					break;
+				case C:
+					show_selected_HUD_range = true;
+					break;
+				case SPACE:
+					player.shoot();
+					break;
+			}
+		});
+
+		scene.setOnKeyReleased(event -> {
+			switch (event.getCode()) {
+				case C:
+					show_selected_HUD_range = false;
+					break;
 			}
 		});
 	}

@@ -36,9 +36,9 @@ public class Main extends Application {
 		// Turn on debug mode
 		LOGGER.setDebugModeTo(false);
 
-		primaryStage.setTitle("Drawing Operations Test");
+		primaryStage.setTitle("Simple 2D game :)");
 		Group root = new Group();
-		Canvas canvas = new Canvas(1920, 1080);
+		Canvas canvas = new Canvas(1280, 720);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
 		// Register mouse position
@@ -64,7 +64,7 @@ public class Main extends Application {
 				gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
 				// background image clears canvas
-				Game.render(gc, canvas);
+				Game.render(canvas);
 
 				// Calculate and display FPS
 				long oldFrameTime = frameTimes[frameTimeIndex];
@@ -84,10 +84,10 @@ public class Main extends Application {
 				}
 
 				// Draw FPS text
-				FPS_TEXT.draw(gc);
+				FPS_TEXT.draw(canvas);
 
 				// Draw reload button
-				reload.draw(gc);
+				reload.draw(canvas);
 
 			}
 		}.start();
@@ -95,7 +95,7 @@ public class Main extends Application {
 
 		root.getChildren().add(canvas);
 		Scene scene = new Scene(root);
-		Game.handleEvents(scene, gc);
+		Game.handleEvents(scene);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

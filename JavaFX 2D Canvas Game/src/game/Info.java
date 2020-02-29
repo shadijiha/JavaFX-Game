@@ -4,7 +4,7 @@
 
 package game;
 
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import shadoMath.Vector;
@@ -52,7 +52,7 @@ public class Info extends GameObject {
 		text.setPosition(new Vertex(image.getPosition().x + image.getDimensions().width, image.getPosition().y + image.getDimensions().height * 0.75));
 	}
 
-	public void draw(GraphicsContext g) {
+	public void draw(Canvas c) {
 
 		// Remove this if the distance traveled is greater than 300 px
 		double eval_distance = initial_position.getDistance(position);
@@ -65,16 +65,16 @@ public class Info extends GameObject {
 		this.update();
 
 		// Update alpha
-		g.setGlobalAlpha(1 - eval_distance / MAX_DISTANCE);
+		c.getGraphicsContext2D().setGlobalAlpha(1 - eval_distance / MAX_DISTANCE);
 
 		// Draw the image and the text
-		image.draw(g);
-		text.draw(g);
+		image.draw(c);
+		text.draw(c);
 
 		// Reset alpha
-		g.setGlobalAlpha(1);
+		c.getGraphicsContext2D().setGlobalAlpha(1);
 
 		// Handle Events
-		super.draw(g);
+		super.draw(c);
 	}
 }

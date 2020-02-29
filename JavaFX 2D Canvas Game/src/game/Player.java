@@ -231,7 +231,7 @@ public class Player extends GameObject {
 	 * @param p Position of the health bar
 	 * @param d dimension of the health bar
 	 */
-	private void drawHealthBar(GraphicsContext g, Vertex p, Dimension d) {
+	private void drawHealthBar(Canvas g, Vertex p, Dimension d) {
 		double percentage = hp / maxHp;
 
 		var main_bar = new Shado.Rectangle((float) p.x, (float) p.y, d.width, d.height);
@@ -245,7 +245,7 @@ public class Player extends GameObject {
 	 * Draw the health bar of the calling object
 	 * @param g The GraphicsContext
 	 */
-	public void drawHealthBar(GraphicsContext g) {
+	public void drawHealthBar(Canvas g) {
 		drawHealthBar(g, new Vertex((float) position.x, (float) position.y - 30), new Dimension(dimensions.width, 15));
 	}
 
@@ -255,7 +255,7 @@ public class Player extends GameObject {
 	 * @param p Position of the health bar
 	 * @param d dimension of the health bar
 	 */
-	private void drawEnergyBar(GraphicsContext g, Vertex p, Dimension d) {
+	private void drawEnergyBar(Canvas g, Vertex p, Dimension d) {
 		double percentage = energy / maxEnergy;
 
 		var main_bar = new Shado.Rectangle((float) p.x, (float) p.y, d.width, d.height);
@@ -271,17 +271,19 @@ public class Player extends GameObject {
 
 	/**
 	 * Draw all the infomation of the current object to the screen
-	 * @param g The Graphic context
+	 * @param c The Canvas where to draw
 	 * @param c The canvas on the graphic context
 	 */
-	public void drawHUD(GraphicsContext g, Canvas c) {
+	public void drawHUD(Canvas c) {
+
+		GraphicsContext g = c.getGraphicsContext2D();
 
 		Dimension HUD_dimensions = new Dimension((float) (c.getWidth() * 0.45), (float) (c.getHeight() * 0.25));
 		Vertex center = new Vertex(c.getWidth() / 2 - HUD_dimensions.width / 2, c.getHeight() - HUD_dimensions.height);
 
 		final var main_HUD = new Shado.Rectangle((float) center.x, (float) center.y, HUD_dimensions.width, HUD_dimensions.height);
 		main_HUD.setFill(Color.rgb(150, 150, 150, 0.8));
-		main_HUD.draw(g);
+		main_HUD.draw(c);
 
 		// Draw big health bar and text
 		float bar_height = (float) (main_HUD.getDimensions().height * 0.10);
@@ -290,96 +292,90 @@ public class Player extends GameObject {
 
 		Dimension health_bar_dim = new Dimension((float) (main_HUD.getDimensions().width * 0.80), bar_height);
 
-		drawHealthBar(g,
+		drawHealthBar(c,
 				health_bar_pos,
 				health_bar_dim);
 
 		var hp_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", hp, maxHp, hpRegen * Timer.deltaTime * Timer.framerate()),
 				(health_bar_pos.x + (health_bar_dim.width) / 2 - 20),
 				(health_bar_pos.y + 2 * bar_height / 3));
-		hp_bar_text.draw(g);
+		hp_bar_text.draw(c);
 
 		// Draw big energy bar
-		drawEnergyBar(g,
+		drawEnergyBar(c,
 				new Vertex(health_bar_pos.x, health_bar_pos.y + bar_height * 1.25),
 				health_bar_dim);
 		var energy_bar_text = new Shado.Text(String.format("%.0f/%.0f + %.2f", energy, maxEnergy, energyRegen * Timer.deltaTime * Timer.framerate()),
 				(health_bar_pos.x + health_bar_dim.width / 2 - 20),
 				(health_bar_pos.y + bar_height * 2));
-		energy_bar_text.draw(g);
+		energy_bar_text.draw(c);
 
 		//========= Draw stats and portrait ==================
 		Dimension stat_box_dim = new Dimension(250, HUD_dimensions.height);
 		var stats_box = new Shado.Rectangle(center.x - stat_box_dim.width, center.y, stat_box_dim.width, stat_box_dim.height);
 		stats_box.setFill(Color.rgb(100, 100, 100, 0.5));
-		stats_box.draw(g);
+		stats_box.draw(c);
 
 		// Display portrait
 		Shado.Image portait = new Shado.Image(texture_path, stats_box.getPosition().x * 1.05, stats_box.getPosition().y + dimensions.height / 2, dimensions.width, dimensions.height);
-		portait.draw(g);
+		portait.draw(c);
 
 		// Display AD stat
 		Vertex stat_start_pos = new Vertex(portait.getPosition().x + portait.getDimensions().width + 20, portait.getPosition().y - 30);
 
 		Shado.Image ad_icon = new Shado.Image("DataFiles/Images/ad.png", stat_start_pos.x, stat_start_pos.y, 20, 20);
 		Shado.Text ad_text = new Shado.Text(Integer.toString((int) this.ad), ad_icon.getPosition().x + ad_icon.getDimensions().width + 5, ad_icon.getCenter().y + 5);
-		ad_icon.draw(g);
-		ad_text.draw(g);
+		ad_icon.draw(c);
+		ad_text.draw(c);
 
 		// Display AP stat
 		Shado.Image ap_icon = new Shado.Image("DataFiles/Images/ability_power.png", ad_text.getPosition().x + 50, ad_icon.getPosition().y, 20, 20);
 		Shado.Text ap_text = new Shado.Text(Integer.toString((int) this.ap), ap_icon.getPosition().x + ap_icon.getDimensions().width + 5, ad_text.getPosition().y);
-		ap_icon.draw(g);
-		ap_text.draw(g);
+		ap_icon.draw(c);
+		ap_text.draw(c);
 
 		// Display Armor stat
 		Shado.Image armor_icon = new Shado.Image("DataFiles/Images/armor.png", stat_start_pos.x, stat_start_pos.y + ad_icon.getDimensions().height * 3, 20, 20);
 		Shado.Text armor_text = new Shado.Text(Integer.toString((int) this.armor), armor_icon.getPosition().x + armor_icon.getDimensions().width + 5, armor_icon.getCenter().y + 5);
-		armor_icon.draw(g);
-		armor_text.draw(g);
+		armor_icon.draw(c);
+		armor_text.draw(c);
 
 		// Display magic resist stat
 		Shado.Image mr_icon = new Shado.Image("DataFiles/Images/mr.png", ap_icon.getPosition().x, armor_icon.getPosition().y, 20, 20);
 		Shado.Text mr_text = new Shado.Text(Integer.toString((int) this.mr), mr_icon.getPosition().x + mr_icon.getDimensions().width + 5, mr_icon.getCenter().y + 5);
-		mr_icon.draw(g);
-		mr_text.draw(g);
+		mr_icon.draw(c);
+		mr_text.draw(c);
 
 		// Display attack speed stat
 		Shado.Image as_icon = new Shado.Image("DataFiles/Images/attack_speed.png", armor_icon.getPosition().x, armor_icon.getPosition().y + armor_icon.getDimensions().height * 3, 20, 20);
 		Shado.Text as_text = new Shado.Text(Double.toString(this.attackSpeed), as_icon.getPosition().x + as_icon.getDimensions().width + 5, as_icon.getCenter().y + 5);
-		as_icon.draw(g);
-		as_text.draw(g);
+		as_icon.draw(c);
+		as_text.draw(c);
 
 		// Display life steal stat
 		Shado.Image lifesteal_icon = new Shado.Image("DataFiles/Images/lifeSteal.png", mr_icon.getPosition().x, mr_icon.getPosition().y + mr_icon.getDimensions().height * 3, 20, 20);
 		Shado.Text lifesteal_text = new Shado.Text(Integer.toString((int) (this.lifeSteal * 100)) + "%",
 				lifesteal_icon.getPosition().x + lifesteal_icon.getDimensions().width + 5, lifesteal_icon.getCenter().y + 5);
-		lifesteal_icon.draw(g);
-		lifesteal_text.draw(g);
+		lifesteal_icon.draw(c);
+		lifesteal_text.draw(c);
 
 		// Display range stat
 		Shado.Image range_icon = new Shado.Image("DataFiles/Images/range.png", as_icon.getPosition().x, as_icon.getPosition().y + as_icon.getDimensions().height * 3, 20, 20);
 		Shado.Text range_text = new Shado.Text(Integer.toString(this.range), range_icon.getPosition().x + range_icon.getDimensions().width + 5, range_icon.getCenter().y + 5);
-		range_icon.draw(g);
-		range_text.draw(g);
+		range_icon.draw(c);
+		range_text.draw(c);
 
 		// Display Crit chance stat
 		Shado.Image crit_icon = new Shado.Image("DataFiles/Images/crit.png", lifesteal_icon.getPosition().x, lifesteal_icon.getPosition().y + lifesteal_icon.getDimensions().height * 3, 20, 20);
 		Shado.Text crit_text = new Shado.Text(Integer.toString((int) (this.critChance * 100)) + "%", crit_icon.getPosition().x + crit_icon.getDimensions().width + 5, crit_icon.getCenter().y + 5);
-		crit_icon.draw(g);
-		crit_text.draw(g);
-
-
+		crit_icon.draw(c);
+		crit_text.draw(c);
 	}
 
-	public void drawRange(GraphicsContext g) {
-
-		g.setGlobalAlpha(0.7);
-
-		new Shado.Circle(position.x, position.y, range).setFill(Color.PURPLE).draw(g);
-
-		g.setGlobalAlpha(1);
-
+	public void drawRange(Canvas g) {
+		g.getGraphicsContext2D().setGlobalAlpha(0.4);
+		new Shado.Circle(position.x - range + dimensions.width / 2, position.y - range + dimensions.height / 2, range).setFill(Color.PURPLE).draw(g);
+		g.getGraphicsContext2D().setGlobalAlpha(1);
 	}
 
 	// Getters

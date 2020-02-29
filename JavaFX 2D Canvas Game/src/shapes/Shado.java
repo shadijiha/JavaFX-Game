@@ -5,6 +5,7 @@
 package shapes;
 
 import game.Mouse;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -72,7 +73,7 @@ public final class Shado {
 		 *
 		 * @param g The GraphicsContext of the canvas
 		 */
-		public void draw(GraphicsContext g) {
+		public void draw(Canvas g) {
 
 			// Handle click event
 			if (clickEvent != null) {
@@ -292,21 +293,30 @@ public final class Shado {
 		}
 
 		/**
-		 * Draws the calling rectangle to a JAVAFX Canvas
+		 * Draws the calling rectangle to a JAVAFX Canvas (Scales the shape depending on the canvas width and height)
 		 *
-		 * @param g The GraphicsContext of the canvas
+		 * @param c The GraphicsContext of the canvas
 		 */
 		@Override
-		public void draw(GraphicsContext g) {
+		public void draw(Canvas c) {
+
+			GraphicsContext gc = c.getGraphicsContext2D();
+
 			// Draw Shape
-			g.setFill(fill);
-			g.setStroke(stroke);
-			g.setLineWidth(lineWidth);
-			g.fillRect(position.x, position.y, dimensions.width, dimensions.height);
-			g.strokeRect(position.x, position.y, dimensions.width, dimensions.height);
+			gc.setFill(fill);
+			gc.setStroke(stroke);
+			gc.setLineWidth(lineWidth);
+
+			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+
+			gc.fillRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+			gc.strokeRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
 			// Handle events by calling the draw in Shado.Shape
-			super.draw(g);
+			super.draw(c);
 		}
 
 		/**
@@ -340,15 +350,24 @@ public final class Shado {
 		}
 
 		@Override
-		public void draw(GraphicsContext g) {
-			g.setFill(fill);
-			g.setStroke(stroke);
-			g.setLineWidth(lineWidth);
-			g.fillOval(position.x, position.y, dimensions.width, dimensions.height);
-			g.strokeOval(position.x, position.y, dimensions.width, dimensions.height);
+		public void draw(Canvas c) {
+
+			GraphicsContext gc = c.getGraphicsContext2D();
+
+			gc.setFill(fill);
+			gc.setStroke(stroke);
+			gc.setLineWidth(lineWidth);
+
+			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+
+			gc.fillOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+			gc.strokeOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
 			// Handle events by calling the draw in Shado.Shape
-			super.draw(g);
+			super.draw(c);
 		}
 
 		@Override
@@ -404,17 +423,27 @@ public final class Shado {
 		/**
 		 * Draws the calling rectangle to a JAVAFX Canvas
 		 *
-		 * @param g The GraphicsContext of the canvas
+		 * @param c The canvas
 		 */
 		@Override
-		public void draw(GraphicsContext g) {
-			g.setFill(fill);
-			g.setStroke(stroke);
-			g.setLineWidth(lineWidth);
-			g.strokeLine(position.x, position.y, dimensions.width, dimensions.height);
+		public void draw(Canvas c) {
+
+			GraphicsContext gc = c.getGraphicsContext2D();
+
+			gc.setFill(fill);
+			gc.setStroke(stroke);
+			gc.setLineWidth(lineWidth);
+
+			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+
+			gc.strokeLine(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+
 
 			// Handle events by calling the draw in Shado.Shape
-			super.draw(g);
+			super.draw(c);
 		}
 
 		/**
@@ -519,15 +548,22 @@ public final class Shado {
 		}
 
 		@Override
-		public void draw(GraphicsContext g) {
+		public void draw(Canvas c) {
+
+			GraphicsContext g = c.getGraphicsContext2D();
+
 			g.setFont(font);
 			g.setFill(fill);
 			g.setStroke(stroke);
-			g.fillText(text, position.x, position.y);
-			g.strokeText(text, position.x, position.y);
+
+			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+
+			g.fillText(text, scaled_position.x, scaled_position.y);
+			g.strokeText(text, scaled_position.x, scaled_position.y);
 
 			// Handle events by calling the draw in Shado.Shape
-			super.draw(g);
+			super.draw(c);
 		}
 
 		@Override
@@ -565,11 +601,19 @@ public final class Shado {
 		}
 
 		@Override
-		public void draw(GraphicsContext g) {
-			g.drawImage(img, position.x, position.y, dimensions.width, dimensions.height);
+		public void draw(Canvas c) {
+
+			GraphicsContext g = c.getGraphicsContext2D();
+
+			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
+					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+
+			g.drawImage(img, scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
 			// Handle events by calling the draw in Shado.Shape
-			super.draw(g);
+			super.draw(c);
 		}
 
 		/**
