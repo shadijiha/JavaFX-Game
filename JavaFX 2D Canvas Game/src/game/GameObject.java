@@ -4,6 +4,7 @@
 
 package game;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import sample.Main;
@@ -47,7 +48,9 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 	}
 
 	// Core
-	public void draw(GraphicsContext g) {
+	public void draw(Canvas c) {
+
+		GraphicsContext g = c.getGraphicsContext2D();
 
 		// Don't draw or evaluate events if the object is deleted
 		if (deleted)
@@ -55,14 +58,14 @@ public abstract class GameObject extends Shado.EventListener<GameObject> {
 
 		// Draw texture if it exists
 		if (texture != null) {
-			texture.draw(g);
+			texture.draw(c);
 
 			// If debug mode is on draw the hitbox
 			if (Main.LOGGER.isDebugMode()) {
-				new Shado.Rectangle(position, dimensions).setFill(Color.TRANSPARENT).setStroke(Color.BLACK).setLineWidth(2).draw(g);
+				new Shado.Rectangle(position, dimensions).setFill(Color.TRANSPARENT).setStroke(Color.BLACK).setLineWidth(2).draw(c);
 			}
 		} else {
-			shape.draw(g);
+			shape.draw(c);
 		}
 
 		// Handle click event
