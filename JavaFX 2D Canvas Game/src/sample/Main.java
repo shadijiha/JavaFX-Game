@@ -95,7 +95,7 @@ public class Main extends Application {
 
 		root.getChildren().add(canvas);
 		Scene scene = new Scene(root);
-		Game.handleEvents(scene, gc);
+		Game.handleEvents(scene);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

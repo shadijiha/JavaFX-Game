@@ -374,9 +374,9 @@ public class Player extends GameObject {
 
 	public void drawRange(GraphicsContext g) {
 
-		g.setGlobalAlpha(0.7);
+		g.setGlobalAlpha(0.4);
 
-		new Shado.Circle(position.x, position.y, range).setFill(Color.PURPLE).draw(g);
+		new Shado.Circle(position.x - range + dimensions.width / 2, position.y - range + dimensions.height / 2, range).setFill(Color.PURPLE).draw(g);
 
 		g.setGlobalAlpha(1);
 

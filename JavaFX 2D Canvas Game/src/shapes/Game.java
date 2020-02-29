@@ -19,10 +19,16 @@ import java.util.List;
 
 public abstract class Game {
 
+	// What resolution the game was made in (to calculate scaling in Shado.Shape)
+	public static final int WIDTH_RESOLUTION_ON_DESIGN = 1920;
+	public static final int HEIGHT_RESOLUTION_ON_DESIGN = 1080;
+
+	// ==========================================
 	private static int GROUND_LEVEL = 400;
 	public static Player player = new Player(50, 0, "DataFiles/playerInfo.son");
 
 	private static Player selectedHUD = player;
+	private static boolean show_selected_HUD_range = false;
 
 	// This list holds environment stuff (sun, sky, etc)
 	private static List<Shado.Shape> environment;
@@ -30,7 +36,7 @@ public abstract class Game {
 	// This list holds all monsters created
 	private static List<Player> allMonsters;
 
-	// This Rectangle is the description box for whenever user hovers over something that needs explanination
+	// This Rectangle is the description box for whenever user hovers over something that needs explanation
 	private static final Shado.Rectangle DESCRIPTION_BOX = new Shado.Rectangle();
 	private static final Shado.Text DESCRIPTION_TEXT = new Shado.Text();
 
@@ -154,6 +160,8 @@ public abstract class Game {
 
 		// Draw Player HUD
 		selectedHUD.drawHUD(g, c);
+		if (show_selected_HUD_range)
+			selectedHUD.drawRange(g);
 
 		// Show description box
 		//DESCRIPTION_BOX.draw(g);
@@ -163,23 +171,12 @@ public abstract class Game {
 	public static void deleteElements() {
 
 		// Go over all the bullets of the player and delete all inactive once
-		List<Bullet> player_bullets = player.getAllBullets();
-		for (int i = player_bullets.size() - 1; i >= 0; i--) {
-			if (!player_bullets.get(i).isActive()) {
-				player_bullets.remove(i);
-			}
-		}
-
+		Util.delete_if(player.getAllBullets(), bullet -> !bullet.isActive());
 
 		// Go over all the bullets of all Monsters and delete all inactive once
 		allMonsters.parallelStream()
 				.forEachOrdered(monster -> {
-					List<Bullet> monster_bullets = monster.getAllBullets();
-					for (int i = monster_bullets.size() - 1; i >= 0; i--) {
-						if (!monster_bullets.get(i).isActive()) {
-							monster_bullets.remove(i);
-						}
-					}
+					Util.delete_if(monster.getAllBullets(), bullet -> !bullet.isActive());
 				});
 
 		// Go over all deleted info and delete them
@@ -224,7 +221,7 @@ public abstract class Game {
 				});
 	}
 
-	public static void handleEvents(Scene scene, GraphicsContext g) {
+	public static void handleEvents(Scene scene) {
 		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
@@ -241,10 +238,21 @@ public abstract class Game {
 						moveWorld(-1 * player.getMS());
 						break;
 					case C:
-						selectedHUD.drawRange(g);
+						show_selected_HUD_range = true;
 						break;
 					case SPACE:
 						player.shoot();
+						break;
+				}
+			}
+		});
+
+		scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				switch (event.getCode()) {
+					case C:
+						show_selected_HUD_range = false;
 						break;
 				}
 			}
