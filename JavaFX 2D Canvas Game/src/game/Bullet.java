@@ -11,7 +11,6 @@ import shapes.Dimension;
 public class Bullet extends GameObject {
 
 	private Player source;
-	private boolean active = true;
 
 	public Bullet(Player source) {
 		super("bullet");
@@ -37,21 +36,5 @@ public class Bullet extends GameObject {
 
 		if (texture != null)
 			texture.move(velocity);
-	}
-
-	/**
-	 * @return Returns if the calling bullet is active (can damage object) or no
-	 */
-	public boolean isActive() {
-		return active;
-	}
-
-	/**
-	 * Set the active stat of the bullet (So it can damage other objects or no)
-	 *
-	 * @param a The activity state
-	 */
-	public void setActivityTo(boolean a) {
-		active = a;
 	}
 }

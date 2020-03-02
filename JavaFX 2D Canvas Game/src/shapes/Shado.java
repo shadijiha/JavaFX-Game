@@ -4,6 +4,7 @@
 
 package shapes;
 
+import game.Game;
 import game.Mouse;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -52,7 +53,7 @@ public final class Shado {
 		}
 	}
 
-	public static abstract class Shape extends EventListener<Shado.Shape> implements Cloneable {
+	public static abstract class Shape extends Shado.EventListener<Shado.Shape> implements Cloneable {
 		protected Vertex position;
 		protected Dimension dimensions;
 		protected Color fill;
@@ -255,6 +256,10 @@ public final class Shado {
 		public Dimension getDimensions() {
 			return dimensions;
 		}
+
+		public double getAspectRatio() {
+			return dimensions.width / dimensions.height;
+		}
 	}
 
 	public static class Rectangle extends Shape {
@@ -307,10 +312,8 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			gc.fillRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 			gc.strokeRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
@@ -358,10 +361,8 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			gc.fillOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 			gc.strokeOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
@@ -434,10 +435,8 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			gc.strokeLine(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
@@ -556,8 +555,7 @@ public final class Shado {
 			g.setFill(fill);
 			g.setStroke(stroke);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = Game.scalePosition(position, c);
 
 			g.fillText(text, scaled_position.x, scaled_position.y);
 			g.strokeText(text, scaled_position.x, scaled_position.y);
@@ -605,10 +603,8 @@ public final class Shado {
 
 			GraphicsContext g = c.getGraphicsContext2D();
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			g.drawImage(img, scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 

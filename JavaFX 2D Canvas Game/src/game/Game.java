@@ -2,14 +2,15 @@
  * All initializations happen here
  */
 
-package shapes;
+package game;
 
-import game.*;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import shadoMath.Util;
 import shadoMath.Vertex;
+import shapes.Dimension;
+import shapes.Shado;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,7 @@ import java.util.List;
 public abstract class Game {
 
 	// What resolution the game was made in (to calculate scaling in Shado.Shape)
-	public static final double WIDTH_RESOLUTION_ON_DESIGN = 1920.0;
-	public static final double HEIGHT_RESOLUTION_ON_DESIGN = 1080.0;
+	public static final Shado.Rectangle DESIGN_RESOLUTION = new Shado.Rectangle(0, 0, 1920.0, 1080.0);
 
 	// ==========================================
 	private static int GROUND_LEVEL = 400;
@@ -43,7 +43,7 @@ public abstract class Game {
 		allMonsters = new ArrayList<>();
 		Platform.allPlatforms = new ArrayList<>();
 
-		GROUND_LEVEL = (int) (c.getHeight() * 0.70);
+		GROUND_LEVEL = (int) ((c.getHeight() * 0.70) * scaleRatio(c));
 		player.setPosition(new Vertex(c.getWidth() * 0.20, 0));
 		player.setTexture("DataFiles/Images/player.png");
 		player.onClick(e -> selectedHUD = (Player) e);
@@ -73,6 +73,7 @@ public abstract class Game {
 			monster.getShape().setFill(Color.PURPLE);
 			monster.setTexture("DataFiles/Images/monster.png");
 			monster.onClick(e -> selectedHUD = (Player) e);
+			monster.onMouseOver(e -> ((Player) e).shoot());
 			allMonsters.add(monster);
 		}
 
@@ -104,24 +105,34 @@ public abstract class Game {
 
 		// Draw all monsters
 		Game.allMonsters.parallelStream()
-				.forEachOrdered(e -> {
+				.forEachOrdered(monster -> {
 
 					// Update monster and draw it if they are not hidden
-					if (!e.isHidden()) {
-						e.draw(g);
-						e.update();
-						e.drawHealthBar(g);    // Draw all Health bars of monsters
+					if (!monster.isHidden()) {
+						monster.draw(g);
+						monster.update();
+						monster.drawHealthBar(g);    // Draw all Health bars of monsters
 					}
 
 					// If monster has less or equal to 0 Hp, Hide it
-					if (e.isDead())
-						e.hide();
+					if (monster.isDead())
+						monster.hide();
 
 					// Draw all bullets of monsters
-					e.getAllBullets().parallelStream()
+					monster.getAllBullets().parallelStream()
 							.forEachOrdered(b -> {
 								b.update();
 								b.draw(g);
+
+								// Detect if bullet has exceeded monster's max range
+								if (b.getPosition().getDistance(monster.getShape().getCenter()) > monster.getRange())
+									b.delete();
+
+								// Detect collision with the player and apply damage to the player
+								if (b.getShape().collides(player.getShape())) {
+									player.damage(monster);
+									b.delete();
+								}
 							});
 				});
 
@@ -137,8 +148,8 @@ public abstract class Game {
 					b.draw(g);
 
 					// Detect if bullet has exceeded range of player
-					if (b.getPosition().getDistance(player.getPosition()) > player.getRange())
-						b.setActivityTo(false);
+					if (b.getPosition().getDistance(player.getShape().getCenter()) > player.getRange())
+						b.delete();
 
 					// Detect collision with monsters
 					allMonsters.parallelStream()
@@ -147,9 +158,9 @@ public abstract class Game {
 								// If a bullet shot by player collides a monster:
 								// Applies only if bullet is active and monster is not hidden
 								// Damage the monster and set the bullet to be inactive (to delete it later)
-								if (b.isActive() && !monster.isHidden() && monster.getShape().collides(b.getShape())) {
+								if (!b.isDeleted() && !monster.isHidden() && monster.getShape().collides(b.getShape())) {
 									monster.damage(player);
-									b.setActivityTo(false);
+									b.delete();
 								}
 							});
 
@@ -177,12 +188,12 @@ public abstract class Game {
 	public static void deleteElements() {
 
 		// Go over all the bullets of the player and delete all inactive once
-		Util.delete_if(player.getAllBullets(), bullet -> !bullet.isActive());
+		Util.delete_if(player.getAllBullets(), GameObject::isDeleted);
 
 		// Go over all the bullets of all Monsters and delete all inactive once
 		allMonsters.parallelStream()
 				.forEachOrdered(monster -> {
-					Util.delete_if(monster.getAllBullets(), bullet -> !bullet.isActive());
+					Util.delete_if(monster.getAllBullets(), GameObject::isDeleted);
 				});
 
 		// Go over all deleted info and delete them
@@ -267,5 +278,34 @@ public abstract class Game {
 					break;
 			}
 		});
+	}
+
+	/**
+	 * This function returns the ratio of Original design on the current canvas size
+	 *
+	 * @param c The current canvas
+	 * @return Returns how much the current size differs from the original Design resolution
+	 */
+	public static double scaleRatio(Canvas c) {
+		return ((c.getWidth() * c.getHeight()) / DESIGN_RESOLUTION.area());
+	}
+
+	public static Dimension scaleDimension(Dimension d, Canvas c) {
+//		double original_area = d.width * d.height;
+//		double canvas_shrink = scaleRatio(c);
+//		double ratio = d.width / d.height;
+//
+//		double new_area = original_area * canvas_shrink;
+//
+//		double new_height = Math.sqrt(canvas_shrink * original_area / ratio);
+//		double new_width = ratio * new_height;
+//
+//		return new Dimension(new_width, new_height);
+		return d;
+	}
+
+	public static Vertex scalePosition(Vertex v, Canvas c) {
+		Dimension d = scaleDimension(new Dimension(v.x, v.y), c);
+		return new Vertex(d.width, d.height);
 	}
 }
