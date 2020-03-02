@@ -317,10 +317,10 @@
       <screen x="2560" y="-69" width="2560" height="1400" />
     </state>
     <state x="3583" y="519" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/2560.-69.2560.1400/0.0.2560.1400@2560.-69.2560.1400" timestamp="1582391775307" />
-    <state x="986" y="440" key="FileChooserDialogImpl" timestamp="1582667736233">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="592" y="259" key="FileChooserDialogImpl" timestamp="1582935671292">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="592" y="259" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1582075833952" />
+    <state x="592" y="259" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1582935671292" />
     <state x="986" y="440" key="FileChooserDialogImpl/2560.-69.2560.1400/0.0.2560.1400@0.0.2560.1400" timestamp="1582667736233" />
     <state x="3546" y="371" key="FileChooserDialogImpl/2560.-69.2560.1400/0.0.2560.1400@2560.-69.2560.1400" timestamp="1582390836225" />
     <state width="2517" height="180" key="GridCell.Tab.0.bottom" timestamp="1583107981082">
@@ -371,10 +371,10 @@
     <state width="1493" height="238" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1582332246374" />
     <state width="2517" height="470" key="GridCell.Tab.1.right/2560.-69.2560.1400/0.0.2560.1400@0.0.2560.1400" timestamp="1582961133193" />
     <state width="2517" height="470" key="GridCell.Tab.1.right/2560.-69.2560.1400/0.0.2560.1400@2560.-69.2560.1400" timestamp="1582691948294" />
-    <state x="813" y="387" key="SettingsEditor" timestamp="1582421351542">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="345" y="0" key="SettingsEditor" timestamp="1582935319209">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="345" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1582160328175" />
+    <state x="345" y="0" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1582935319209" />
     <state x="813" y="387" key="SettingsEditor/2560.-69.2560.1400/0.0.2560.1400@0.0.2560.1400" timestamp="1582421351542" />
     <state x="3083" y="269" key="SettingsEditor/2560.-69.2560.1400/0.0.2560.1400@2560.-69.2560.1400" timestamp="1582391718134" />
     <state x="834" y="745" key="com.intellij.ide.util.TipDialog" timestamp="1583107330285">
