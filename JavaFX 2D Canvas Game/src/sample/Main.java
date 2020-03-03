@@ -1,5 +1,6 @@
 package sample;
 
+import game.Game;
 import game.Mouse;
 import game.Timer;
 import javafx.animation.AnimationTimer;
@@ -10,7 +11,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
 import logger.Logger;
-import shapes.Game;
 import shapes.Shado;
 
 public class Main extends Application {
@@ -38,7 +38,7 @@ public class Main extends Application {
 
 		primaryStage.setTitle("Simple 2D game :)");
 		Group root = new Group();
-		Canvas canvas = new Canvas(1280, 720);
+		Canvas canvas = new Canvas(1920, 1080);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
 		// Register mouse position

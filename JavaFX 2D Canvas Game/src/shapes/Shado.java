@@ -4,6 +4,7 @@
 
 package shapes;
 
+import game.Game;
 import game.Mouse;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -27,7 +28,8 @@ public final class Shado {
 		protected Consumer<E> clickEvent;
 		protected Consumer<E> hoverEvent;
 		protected Consumer<E> mouseOutEvent;
-		protected boolean outEventConsumed;        // This variable is here to make sure that the onMouseOut event is applied only once (and not every frame)
+		protected boolean outEventConsumed; // This variable is here to make sure that the onMouseOut event is applied
+										// only once (and not every frame)
 
 		protected EventListener() {
 			// Initialize events
@@ -52,7 +54,7 @@ public final class Shado {
 		}
 	}
 
-	public static abstract class Shape extends EventListener<Shado.Shape> implements Cloneable {
+	public static abstract class Shape extends Shado.EventListener<Shado.Shape> implements Cloneable {
 		protected Vertex position;
 		protected Dimension dimensions;
 		protected Color fill;
@@ -135,9 +137,7 @@ public final class Shado {
 		}
 
 		public boolean collides(double x, double y, double w, double h) {
-			return x + w >= position.x
-					&& x <= position.x + dimensions.width
-					&& y + h >= position.y
+			return x + w >= position.x && x <= position.x + dimensions.width && y + h >= position.y
 					&& y <= position.y + dimensions.height;
 		}
 
@@ -219,7 +219,8 @@ public final class Shado {
 		}
 
 		public String toString() {
-			return String.format("%s (x: %f, y: %f, w: %f, h: %f)", getClass(), position.x, position.y, dimensions.width, dimensions.height);
+			return String.format("%s (x: %f, y: %f, w: %f, h: %f)", getClass(), position.x, position.y,
+					dimensions.width, dimensions.height);
 		}
 
 		public Shape clone() {
@@ -254,6 +255,10 @@ public final class Shado {
 		 */
 		public Dimension getDimensions() {
 			return dimensions;
+		}
+
+		public double getAspectRatio() {
+			return dimensions.width / dimensions.height;
 		}
 	}
 
@@ -293,7 +298,8 @@ public final class Shado {
 		}
 
 		/**
-		 * Draws the calling rectangle to a JAVAFX Canvas (Scales the shape depending on the canvas width and height)
+		 * Draws the calling rectangle to a JAVAFX Canvas (Scales the shape depending on
+		 * the canvas width and height)
 		 *
 		 * @param c The GraphicsContext of the canvas
 		 */
@@ -307,10 +313,8 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
-			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			gc.fillRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 			gc.strokeRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
@@ -358,10 +362,8 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
-			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			gc.fillOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 			gc.strokeOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
@@ -434,13 +436,10 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
-			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			gc.strokeLine(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
-
 
 			// Handle events by calling the draw in Shado.Shape
 			super.draw(c);
@@ -479,7 +478,8 @@ public final class Shado {
 		}
 
 		public Text(final Text other) {
-			this(other.text, (float) other.position.x, (float) other.position.y, other.font, other.fill, other.stroke);
+			this(other.text, (float) other.position.x, (float) other.position.y, other.font, other.fill,
+					other.stroke);
 		}
 
 		// Getters
@@ -556,8 +556,7 @@ public final class Shado {
 			g.setFill(fill);
 			g.setStroke(stroke);
 
-			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Vertex scaled_position = Game.scalePosition(position, c);
 
 			g.fillText(text, scaled_position.x, scaled_position.y);
 			g.strokeText(text, scaled_position.x, scaled_position.y);
@@ -594,7 +593,8 @@ public final class Shado {
 		}
 
 		/**
-		 * @return Returns the absolute path of the Shado.Image with disk name replaced with "file:/"
+		 * @return Returns the absolute path of the Shado.Image with disk name replaced
+		 *         with "file:/"
 		 */
 		public String getImageAbsolutePath() {
 			return String.valueOf(file.toURI());
@@ -605,10 +605,8 @@ public final class Shado {
 
 			GraphicsContext g = c.getGraphicsContext2D();
 
-			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
-			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
-					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Vertex scaled_position = Game.scalePosition(position, c);
+			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
 
 			g.drawImage(img, scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
@@ -661,7 +659,3 @@ public final class Shado {
 		}
 	}
 }
-
-
-
-
