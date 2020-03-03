@@ -307,10 +307,10 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
 
 			gc.fillRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 			gc.strokeRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
@@ -358,10 +358,10 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
 
 			gc.fillOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 			gc.strokeOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
@@ -434,10 +434,10 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
 
 			gc.strokeLine(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
@@ -556,8 +556,8 @@ public final class Shado {
 			g.setFill(fill);
 			g.setStroke(stroke);
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
 
 			g.fillText(text, scaled_position.x, scaled_position.y);
 			g.strokeText(text, scaled_position.x, scaled_position.y);
@@ -605,10 +605,10 @@ public final class Shado {
 
 			GraphicsContext g = c.getGraphicsContext2D();
 
-			Vertex scaled_position = new Vertex(position.x / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					position.y / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
-			Dimension scaled_dimension = new Dimension(dimensions.width / Game.WIDTH_RESOLUTION_ON_DESIGN * c.getWidth(),
-					dimensions.height / Game.HEIGHT_RESOLUTION_ON_DESIGN * c.getHeight());
+			Vertex scaled_position = new Vertex(position.x * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					position.y * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
+			Dimension scaled_dimension = new Dimension(dimensions.width * Math.sqrt(c.getWidth() / Game.WIDTH_RESOLUTION_ON_DESIGN),
+					dimensions.height * Math.sqrt(c.getHeight() / Game.HEIGHT_RESOLUTION_ON_DESIGN));
 
 			g.drawImage(img, scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
 
