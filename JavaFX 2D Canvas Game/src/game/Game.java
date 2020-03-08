@@ -125,7 +125,7 @@ public abstract class Game {
 								b.draw(g);
 
 								// Detect if bullet has exceeded monster's max range
-								if (b.getPosition().getDistance(monster.getShape().getCenter()) > monster.getRange())
+								if (b.getPosition().getDistance(b.getInitialPosition()) > monster.getRange())
 									b.delete();
 
 								// Detect collision with the player and apply damage to the player
@@ -148,7 +148,7 @@ public abstract class Game {
 					b.draw(g);
 
 					// Detect if bullet has exceeded range of player
-					if (b.getPosition().getDistance(player.getShape().getCenter()) > player.getRange())
+					if (b.getPosition().getDistance(b.getInitialPosition()) > player.getRange())
 						b.delete();
 
 					// Detect collision with monsters

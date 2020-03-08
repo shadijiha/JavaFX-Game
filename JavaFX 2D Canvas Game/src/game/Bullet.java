@@ -11,11 +11,13 @@ import shapes.Dimension;
 public class Bullet extends GameObject {
 
 	private Player source;
+	private Vertex initial_position;
 
 	public Bullet(Player source) {
 		super("bullet");
 		this.source = source;
 		this.position = new Vertex(source.position.x + source.dimensions.width, source.position.y + source.dimensions.height / 2);
+		this.initial_position = new Vertex(this.position);
 		this.shape = this.shape.setPosition(
 				this.position
 		);
@@ -36,5 +38,12 @@ public class Bullet extends GameObject {
 
 		if (texture != null)
 			texture.move(velocity);
+	}
+
+	/**
+	 * @return Returns the position from where the bullet was shot
+	 */
+	public Vertex getInitialPosition() {
+		return this.initial_position;
 	}
 }

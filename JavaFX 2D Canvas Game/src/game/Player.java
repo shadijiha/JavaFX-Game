@@ -22,6 +22,7 @@ public class Player extends GameObject {
 	public static List<Player> allPlayers = new ArrayList<Player>();
 
 	private List<Bullet> bullets = new ArrayList<>();
+	private List<Item> items = new ArrayList<>();
 
 	private double maxHp;
 	private double hp;
