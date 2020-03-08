@@ -38,7 +38,7 @@ public class Main extends Application {
 
 		primaryStage.setTitle("Simple 2D game :)");
 		Group root = new Group();
-		Canvas canvas = new Canvas(1920, 1080);
+		Canvas canvas = new Canvas(1280, 720);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 
 		// Register mouse position
