@@ -29,7 +29,7 @@ public final class Shado {
 		protected Consumer<E> hoverEvent;
 		protected Consumer<E> mouseOutEvent;
 		protected boolean outEventConsumed; // This variable is here to make sure that the onMouseOut event is applied
-										// only once (and not every frame)
+		// only once (and not every frame)
 
 		protected EventListener() {
 			// Initialize events
@@ -313,11 +313,10 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = Game.scalePosition(position, c);
-			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
+			Game.scaleShape(this, c);
 
-			gc.fillRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
-			gc.strokeRect(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+			gc.fillRect(position.x, position.y, dimensions.width, dimensions.height);
+			gc.strokeRect(position.x, position.y, dimensions.width, dimensions.height);
 
 			// Handle events by calling the draw in Shado.Shape
 			super.draw(c);
@@ -362,11 +361,10 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = Game.scalePosition(position, c);
-			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
+			Game.scaleShape(this, c);
 
-			gc.fillOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
-			gc.strokeOval(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+			gc.fillOval(position.x, position.y, dimensions.width, dimensions.height);
+			gc.strokeOval(position.x, position.y, dimensions.width, dimensions.height);
 
 			// Handle events by calling the draw in Shado.Shape
 			super.draw(c);
@@ -436,10 +434,9 @@ public final class Shado {
 			gc.setStroke(stroke);
 			gc.setLineWidth(lineWidth);
 
-			Vertex scaled_position = Game.scalePosition(position, c);
-			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
+			Game.scaleShape(this, c);
 
-			gc.strokeLine(scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+			gc.strokeLine(position.x, position.y, dimensions.width, dimensions.height);
 
 			// Handle events by calling the draw in Shado.Shape
 			super.draw(c);
@@ -556,10 +553,10 @@ public final class Shado {
 			g.setFill(fill);
 			g.setStroke(stroke);
 
-			Vertex scaled_position = Game.scalePosition(position, c);
+			Game.scaleShape(this, c);
 
-			g.fillText(text, scaled_position.x, scaled_position.y);
-			g.strokeText(text, scaled_position.x, scaled_position.y);
+			g.fillText(text, position.x, position.y);
+			g.strokeText(text, position.x, position.y);
 
 			// Handle events by calling the draw in Shado.Shape
 			super.draw(c);
@@ -594,7 +591,7 @@ public final class Shado {
 
 		/**
 		 * @return Returns the absolute path of the Shado.Image with disk name replaced
-		 *         with "file:/"
+		 * with "file:/"
 		 */
 		public String getImageAbsolutePath() {
 			return String.valueOf(file.toURI());
@@ -605,10 +602,9 @@ public final class Shado {
 
 			GraphicsContext g = c.getGraphicsContext2D();
 
-			Vertex scaled_position = Game.scalePosition(position, c);
-			Dimension scaled_dimension = Game.scaleDimension(dimensions, c);
+			Game.scaleShape(this, c);
 
-			g.drawImage(img, scaled_position.x, scaled_position.y, scaled_dimension.width, scaled_dimension.height);
+			g.drawImage(img, position.x, position.y, dimensions.width, dimensions.height);
 
 			// Handle events by calling the draw in Shado.Shape
 			super.draw(c);
@@ -637,7 +633,7 @@ public final class Shado {
 		public Image setDimensions(final Dimension d) {
 			this.dimensions.width = d.width;
 			this.dimensions.height = d.height;
-			img = new javafx.scene.image.Image(source, dimensions.width, dimensions.height, false, true);
+			img = new javafx.scene.image.Image(String.valueOf(file.toURI()), dimensions.width, dimensions.height, false, true);
 			return this;
 		}
 

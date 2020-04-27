@@ -9,7 +9,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import shadoMath.Util;
 import shadoMath.Vertex;
-import shapes.Dimension;
 import shapes.Shado;
 
 import java.util.ArrayList;
@@ -290,22 +289,49 @@ public abstract class Game {
 		return ((c.getWidth() * c.getHeight()) / DESIGN_RESOLUTION.area());
 	}
 
-	public static Dimension scaleDimension(Dimension d, Canvas c) {
-//		double original_area = d.width * d.height;
-//		double canvas_shrink = scaleRatio(c);
-//		double ratio = d.width / d.height;
-//
-//		double new_area = original_area * canvas_shrink;
-//
-//		double new_height = Math.sqrt(canvas_shrink * original_area / ratio);
-//		double new_width = ratio * new_height;
-//
-//		return new Dimension(new_width, new_height);
-		return d;
-	}
+	public static void scaleShape(Shado.Shape image, Canvas canvas) {
 
-	public static Vertex scalePosition(Vertex v, Canvas c) {
-		Dimension d = scaleDimension(new Dimension(v.x, v.y), c);
-		return new Vertex(d.width, d.height);
+		double imgWidth = image.getDimensions().width;
+		double imgHeight = image.getDimensions().height;
+
+		double imgAspect = (double) imgHeight / imgWidth;
+
+		double canvasWidth = canvas.getWidth();
+		double canvasHeight = canvas.getHeight();
+
+		double canvasAspect = (double) canvasHeight / canvasWidth;
+
+		double x1 = 0; // top left X position
+		double y1 = 0; // top left Y position
+		double x2 = 0; // bottom right X position
+		double y2 = 0; // bottom right Y position
+
+		if (imgWidth < canvasWidth && imgHeight < canvasHeight) {
+			// the image is smaller than the canvas
+			x1 = (canvasWidth - imgWidth) / 2;
+			y1 = (canvasHeight - imgHeight) / 2;
+			x2 = imgWidth + x1;
+			y2 = imgHeight + y1;
+
+		} else {
+			if (canvasAspect > imgAspect) {
+				y1 = canvasHeight;
+				// keep image aspect ratio
+				canvasHeight = (int) (canvasWidth * imgAspect);
+				y1 = (y1 - canvasHeight) / 2;
+			} else {
+				x1 = canvasWidth;
+				// keep image aspect ratio
+				canvasWidth = (int) (canvasHeight / imgAspect);
+				x1 = (x1 - canvasWidth) / 2;
+			}
+			x2 = canvasWidth + x1;
+			y2 = canvasHeight + y1;
+		}
+
+		image.getDimensions().width = x2 - x1;
+		image.getDimensions().height = y2 - y1;
+
+		//g.drawImage(image, x1, y1, x2, y2, 0, 0, imgWidth, imgHeight, null);
 	}
 }
